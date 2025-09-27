@@ -25,6 +25,18 @@ const author =
 
 {isSubpost(post.id) && <meta name="robots" content="noindex" />}
 
+{/* Preload LCP image for better performance */}
+{
+  post?.data?.image?.src && (
+    <link
+      rel="preload"
+      as="image"
+      href={post.data.image.src}
+      fetchpriority="high"
+    />
+  )
+}
+
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta

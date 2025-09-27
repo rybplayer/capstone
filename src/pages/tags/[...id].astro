@@ -42,9 +42,9 @@ const { tag, posts } = Astro.props
 
   <ul class="flex flex-col gap-y-4">
     {
-      posts.map((post) => (
+      posts.map((post, index) => (
         <li>
-          <BlogCard entry={post} />
+          <BlogCard entry={post} isFirst={index === 0} />
         </li>
       ))
     }

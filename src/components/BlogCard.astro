@@ -16,9 +16,10 @@ import Link from './Link.astro'
 
 interface Props {
   entry: CollectionEntry<'blog'>
+  isFirst?: boolean
 }
 
-const { entry } = Astro.props
+const { entry, isFirst = false } = Astro.props
 const formattedDate = formatDate(entry.data.date)
 const readTime = await getCombinedReadingTime(entry.id)
 const authors = await parseAuthors(entry.data.authors ?? [])
@@ -26,7 +27,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
 ---
 
 <div
-  class="hover:bg-muted/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
+  class="hover:bg-secondary/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
 >
   <Link
     href={`/${entry.collection}/${entry.id}`}
@@ -34,13 +35,16 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
   >
     {
       entry.data.image && (
-        <div class="w-full sm:max-w-3xs sm:shrink-0">
+        <div class="relative w-full sm:max-w-3xs sm:shrink-0">
+          <div class="bg-accent absolute inset-0" aria-hidden="true" />
           <Image
             src={entry.data.image}
             alt={entry.data.title}
             width={1200}
             height={630}
-            class="object-cover"
+            loading={isFirst ? 'eager' : 'lazy'}
+            fetchpriority={isFirst ? 'high' : undefined}
+            class="relative z-10 object-cover"
           />
         </div>
       )
@@ -59,10 +63,9 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
               {authors.map((author) => (
                 <div class="flex items-center gap-x-1.5">
                   <AvatarComponent
-                    client:load
                     src={author.avatar}
                     alt={author.name}
-                    fallback={author.name[0]}
+                    fallback={author.name[0] ?? ''}
                     className="size-5 rounded-full"
                   />
                   <span>{author.name}</span>
@@ -92,7 +95,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
         entry.data.tags && (
           <div class="flex flex-wrap gap-2">
             {entry.data.tags.map((tag) => (
-              <Badge variant="muted" className="flex items-center gap-x-1">
+              <Badge variant="secondary" className="flex items-center gap-x-1">
                 <Icon name="lucide:hash" class="size-3" />
                 {tag}
               </Badge>
