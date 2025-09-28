@@ -1,10 +1,6 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content'
 import { readingTime, calculateWordCountFromHtml } from '@/lib/utils'
 
-export async function getAllAuthors(): Promise<CollectionEntry<'authors'>[]> {
-  return await getCollection('authors')
-}
-
 export async function getAllPosts(): Promise<CollectionEntry<'blog'>[]> {
   const posts = await getCollection('blog')
   return posts
@@ -133,7 +129,7 @@ export async function getSortedTags(): Promise<
 }
 
 export function getParentId(subpostId: string): string {
-  return subpostId.split('/')[0]
+  return subpostId.split('/')[0]!
 }
 
 export async function getSubpostsForParent(
@@ -191,21 +187,15 @@ export async function getParentPost(
   return allPosts.find((post) => post.id === parentId) || null
 }
 
-export async function parseAuthors(authorIds: string[] = []) {
+export function parseAuthors(authorIds: string[] = []) {
   if (!authorIds.length) return []
 
-  const allAuthors = await getAllAuthors()
-  const authorMap = new Map(allAuthors.map((author) => [author.id, author]))
-
-  return authorIds.map((id) => {
-    const author = authorMap.get(id)
-    return {
-      id,
-      name: author?.data?.name || id,
-      avatar: author?.data?.avatar || '/authors/default.svg',
-      isRegistered: !!author,
-    }
-  })
+  // Simplified: just return author names as strings
+  return authorIds.map((name) => ({
+    id: name,
+    name: name,
+    isRegistered: false, // No longer using author collection
+  }))
 }
 
 export async function getPostById(

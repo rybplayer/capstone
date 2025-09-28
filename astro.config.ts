@@ -64,7 +64,20 @@ export default defineConfig({
         uiFontFamily: 'var(--font-sans)',
       },
     }),
-    mdx(),
+    mdx({
+      remarkPlugins: [remarkMath, remarkEmoji],
+      rehypePlugins: [
+        [
+          rehypeExternalLinks,
+          {
+            target: '_blank',
+            rel: ['nofollow', 'noreferrer', 'noopener'],
+          },
+        ],
+        rehypeHeadingIds,
+        rehypeKatex,
+      ],
+    }),
     react(),
     sitemap(),
     icon(),

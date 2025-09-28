@@ -1,5 +1,5 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
+// import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import { badgeVariants } from '@/components/ui/badge'
@@ -12,7 +12,7 @@ const sortedTags = await getSortedTags()
 
 <Layout class="max-w-3xl">
   <PageHead slot="head" title="Tags" />
-  <Breadcrumbs items={[{ label: 'Tags', icon: 'lucide:tags' }]} />
+  <!-- <Breadcrumbs items={[{ label: 'Tags', icon: 'lucide:tags' }]} /> -->
 
   <div class="flex flex-col gap-4">
     <div class="flex flex-wrap gap-2">

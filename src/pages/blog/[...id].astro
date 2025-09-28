@@ -1,6 +1,5 @@
 ---
-import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
+// import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PostHead from '@/components/PostHead.astro'
 import PostNavigation from '@/components/PostNavigation.astro'
 import SubpostsHeader from '@/components/SubpostsHeader.astro'
@@ -15,7 +14,6 @@ import {
   getAllPostsAndSubposts,
   getCombinedReadingTime,
   getParentId,
-  getParentPost,
   getPostReadingTime,
   getSubpostCount,
   getTOCSections,
@@ -39,11 +37,11 @@ export async function getStaticPaths() {
 const post = Astro.props
 const currentPostId = Astro.params.id
 const { Content, headings } = await render(post)
-const authors = await parseAuthors(post.data.authors ?? [])
+const authors = parseAuthors(post.data.authors ?? [])
 
 const isCurrentSubpost = isSubpost(currentPostId)
 const navigation = await getAdjacentPosts(currentPostId)
-const parentPost = isCurrentSubpost ? await getParentPost(currentPostId) : null
+// const parentPost = isCurrentSubpost ? await getParentPost(currentPostId) : null
 
 const hasChildPosts = await hasSubposts(currentPostId)
 const subpostCount = !isCurrentSubpost
@@ -73,14 +71,14 @@ const tocSections = await getTOCSections(currentPostId)
       !(
         isCurrentSubpost &&
         headings.length === 1 &&
-        headings[0].text === post.data.title
+        headings[0]?.text === post.data.title
       ) && <TOCHeader slot="table-of-contents" headings={headings} />
   }
 
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(calc(var(--breakpoint-md)-2rem),100%)_minmax(0px,1fr)] gap-y-6"
   >
-    <div class="col-start-2">
+    <!-- <div class="col-start-2">
       <Breadcrumbs
         items={[
           { href: '/blog', label: 'Blog', icon: 'lucide:library-big' },
@@ -106,15 +104,12 @@ const tocSections = await getTOCSections(currentPostId)
               ]),
         ]}
       />
-    </div>
+    </div> -->
 
     {
       post.data.image && (
-        <div class="col-span-full mx-auto w-full max-w-5xl relative">
-          <div
-            class="absolute inset-0 bg-accent"
-            aria-hidden="true"
-          ></div>
+        <div class="relative col-span-full mx-auto w-full max-w-5xl">
+          <div class="bg-accent absolute inset-0" aria-hidden="true" />
           <Image
             src={post.data.image}
             alt={post.data.title}
@@ -122,7 +117,7 @@ const tocSections = await getTOCSections(currentPostId)
             height={630}
             loading="eager"
             fetchpriority="high"
-            class="object-cover relative z-10 w-full"
+            class="relative z-10 w-full object-cover"
           />
         </div>
       )
@@ -144,26 +139,7 @@ const tocSections = await getTOCSections(currentPostId)
             authors.length > 0 && (
               <div class="flex w-full items-center justify-center gap-x-2 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0">
                 {authors.map((author) => (
-                  <div class="flex items-center gap-x-1.5">
-                    <Image
-                      src={author.avatar}
-                      alt={author.name}
-                      width={20}
-                      height={20}
-                      class="rounded-full"
-                    />
-                    {author.isRegistered ? (
-                      <Link
-                        href={`/authors/${author.id}`}
-                        underline
-                        class="text-foreground"
-                      >
-                        <span>{author.name}</span>
-                      </Link>
-                    ) : (
-                      <span>{author.name}</span>
-                    )}
-                  </div>
+                  <span>{author.name}</span>
                 ))}
               </div>
             )

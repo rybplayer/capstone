@@ -4,7 +4,7 @@ import ThemeToggle from '@/components/ThemeToggle.astro'
 import MobileMenu from '@/components/ui/mobile-menu'
 import { NAV_LINKS, SITE } from '@/consts'
 import { Image } from 'astro:assets'
-import logoBlack from '../../public/static/logo-black.svg'
+import logo from '../../public/static/logo.svg'
 ---
 
 <header transition:persist>
@@ -14,9 +14,9 @@ import logoBlack from '../../public/static/logo-black.svg'
     <Link href="/" class="flex shrink-0 items-center justify-center gap-4">
       <!-- Header logo -->
       <Image
-        src={logoBlack}
+        src={logo}
         alt="Logo"
-        class="h-8 w-auto sm:h-10 dark:invert"
+        class="h-8 w-auto sm:h-10"
         style="aspect-ratio: 237/286;"
       />
       <!-- Header title -->

@@ -16,6 +16,16 @@ const author =
   post.data.authors && post.data.authors.length > 0
     ? post.data.authors.join(', ')
     : SITE.author
+
+// Use preview image for Open Graph if available, otherwise fallback to regular image
+let ogImage = image
+if (post?.data?.previewImage?.src) {
+  // Use the dedicated preview image for Open Graph
+  ogImage = new URL(`${SITE.href}${post.data.previewImage.src}`, Astro.site)
+} else if (post?.data?.image?.src) {
+  // Fallback to regular image
+  ogImage = new URL(`${SITE.href}${post.data.image.src}`, Astro.site)
+}
 ---
 
 <title>{`${title} | ${SITE.title}`}</title>
@@ -39,12 +49,7 @@ const author =
 
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta
-  property="og:image"
-  content={post?.data?.image?.src
-    ? `${SITE.href}${post.data.image.src}`
-    : image}
-/>
+<meta property="og:image" content={ogImage} />
 <meta property="og:image:alt" content={title} />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content={SITE.locale} />
@@ -54,12 +59,7 @@ const author =
 
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
-<meta
-  property="twitter:image"
-  content={post?.data?.image?.src
-    ? `${SITE.href}${post.data.image.src}`
-    : image}
-/>
+<meta property="twitter:image" content={ogImage} />
 <meta name="twitter:image:alt" content={title} />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:creator" content={author} />

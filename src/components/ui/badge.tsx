@@ -17,6 +17,7 @@ const badgeVariants = cva(
           'border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70',
         outline:
           'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
+        link: 'border-transparent bg-primary text-primary-foreground px-3 py-1 text-sm cursor-pointer hover:bg-primary/90 focus-visible:ring-primary/20 dark:focus-visible:ring-primary/40 transition-all duration-200',
       },
     },
     defaultVariants: {
@@ -25,20 +26,47 @@ const badgeVariants = cva(
   },
 )
 
+interface BadgeProps extends VariantProps<typeof badgeVariants> {
+  className?: string
+  asChild?: boolean
+  link?: string
+}
+
 function Badge({
   className,
   variant,
   asChild = false,
+  link,
   ...props
-}: React.ComponentProps<'span'> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-  const Comp = asChild ? SlotPrimitive.Root : 'span'
+}: BadgeProps & React.HTMLAttributes<HTMLElement>) {
+  if (asChild) {
+    return (
+      <SlotPrimitive.Root
+        data-slot="badge"
+        className={cn(badgeVariants({ variant }), className)}
+        {...props}
+      />
+    )
+  }
+
+  if (link) {
+    return (
+      <a
+        data-slot="badge"
+        className={cn(badgeVariants({ variant }), className)}
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+      />
+    )
+  }
 
   return (
-    <Comp
+    <span
       data-slot="badge"
       className={cn(badgeVariants({ variant }), className)}
-      {...props}
+      {...(props as React.HTMLAttributes<HTMLSpanElement>)}
     />
   )
 }
