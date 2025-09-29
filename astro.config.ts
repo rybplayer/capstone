@@ -20,6 +20,10 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   site: 'https://ryanbatubara.dev',
+  prefetch: {
+    prefetchAll: false,
+    defaultStrategy: 'hover',
+  },
   integrations: [
     expressiveCode({
       themes: ['github-light', 'github-dark'],

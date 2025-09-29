@@ -1,20 +1,27 @@
 ---
 import Link from '@/components/Link.astro'
 import { Badge } from '@/components/ui/badge'
-import { formatDate } from '@/lib/utils'
+import { cardVariants } from '@/lib/card-variants'
+import { cn, formatDate } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
 
 interface Props {
   project: CollectionEntry<'projects'>
+  disableHover?: boolean
 }
 
-const { project } = Astro.props
+const { project, disableHover = false } = Astro.props
 ---
 
 <div
-  class="hover:bg-secondary/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
+  class={cn(
+    cardVariants({
+      variant: 'default',
+      hover: disableHover ? 'disabled' : 'enabled',
+    }),
+  )}
 >
   <Link
     href={project.data.link}
@@ -23,7 +30,7 @@ const { project } = Astro.props
   >
     {
       project.data.image && (
-        <div class="w-full sm:max-w-3xs sm:shrink-0">
+        <div class="w-full border sm:max-w-3xs sm:shrink-0">
           <Image
             src={project.data.image}
             alt={project.data.name}
@@ -35,7 +42,7 @@ const { project } = Astro.props
       )
     }
     <div class="grow">
-      <h3 class="mb-1 text-lg font-medium">
+      <h3 class="mb-1 text-lg font-semibold">
         {project.data.name}
       </h3>
       <p class="text-muted-foreground mb-2 text-sm">

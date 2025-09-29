@@ -1,12 +1,13 @@
 import type { IconMap, SocialLink, Site } from '@/types'
 
 export const SITE: Site = {
-  title: 'Ryan Batubara',
+  title: 'Ryan Y. Batubara',
   description: "Ryan Batubara's Website",
   href: 'https://ryanbatubara.dev',
   author: 'Ryan Batubara',
   locale: 'en-US',
-  featuredPostCount: 2,
+  featuredPostCount: 1,
+  featuredProjectCount: 1,
   postsPerPage: 10,
 }
 
