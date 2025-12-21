@@ -7,3 +7,86 @@ image: './power_of_notation.png'
 previewImage: './power_of_notation_preview.png'
 authors: ['Ryan Batubara']
 ---
+
+import AbcNotation from '@/components/AbcNotation.astro';
+import Felicidade from './Felicidade.svg';
+import Callout from '@/components/Callout.astro'
+
+# What is musical notation?
+
+There are all sorts of [musical notation](https://en.wikipedia.org/wiki/Musical_notation). Many people are perhaps familiar with [Western musical notation](https://en.wikipedia.org/wiki/List_of_musical_symbols):
+
+<AbcNotation abc={`
+X:2
+M:C
+L:1/4
+GABc |
+`} instrument='piano'/>
+
+In [scientific pitch notation](https://en.wikipedia.org/wiki/Scientific_pitch_notation), the above denotes playing notes `G4`, `A4`, `B4`, and `C5` for one beat each. In [solfège](https://en.wikipedia.org/wiki/Solf%C3%A8ge), this would be `sol`, `la`, `ti`, `do` for one beat each. Regardless of what notation you use, notation essentially boils down to what is played when.
+
+## What is tablature?
+
+For those who play fretted instruments such as the guitar, an alternative notation called [tablature](https://en.wikipedia.org/wiki/Tablature) (or [tab](https://en.wikipedia.org/wiki/Tablature) for short) may also be familiar:
+
+<AbcNotation abc={`
+X:1
+M:C
+L:1/4
+GABc |
+`}/>
+
+In tabs, frets of a stringed instrument are used to denote what notes are played. Here a guitar, tuned to `E3 A3 D4 G4 B4 E5` from bottom to top, is used as reference. For example, `B4` corresponds to fret `0` (i.e. the open, unfretted string) of the string `B4`. `C4` corresponds to fret `1` of the same string, because it's the next note up in [12 equal temperament](https://en.wikipedia.org/wiki/12_equal_temperament).
+
+One of the major advantages of tabs is that it shows not only _what_ notes to play, but also _where_ to play them. For example, consider this alternative fingering:
+
+<AbcNotation abc={`
+X:1
+M:C
+L:1/4
+GABc |
+`} tuning={'["D,", "A,", "D", "G", "e", "f"]'} />
+
+Here, the same four notes are played on the `G4` string, and the `B4` string is unused. Without adding to the western notation, we are unable to differentiate between the two examples. After all, they play the same notes, just in different ways. This disambiguation of _where_ to play notes is for me tabs' biggest advantage compared to western notation.
+
+## The problem with tabs
+
+Though tabs tell you _where_ to play notes, it doesn't tell you _when_ to play them. Kind of. Consider this:
+
+<AbcNotation abc={`
+X:1
+M:C
+L:1/4
+G<A Bc |
+`} tuning={'["D,", "A,", "D", "G", "e", "f"]'} />
+
+Here, `G4` needs to be played for half a beat, while `A4` needs to be played for one and a half beats. The western notation makes this precisely clear. The tabs just move the notes around so that the space between `0` and `2` is roughly half the space between `2` and `4`. This can get very ambiguous very quickly. For example, here is the opening bar of [Felicidade arr. Dyens](https://www.youtube.com/watch?v=pSF_Rzrw4V8):
+
+<AbcNotation abc={`
+X:1
+M:C
+L:1/8
+A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
+`} />
+
+This creates a sort of tradeoff; you want the western notation for its precision in time, but you also want tablature for its precision in space (that is, where on the fretboard).
+
+## Just stave the tabs, right?
+
+One solution to this conundrum is to just stave the tabs:
+
+<img src={Felicidade.src} class="w-[clamp(250px,50%,600px)] dark:invert" />
+
+Personally, I think this is quite elegant.
+
+# The real problem with tabs
+
+Readers prone to inspect element will realize that this last staved tab is an `svg` rather than some fancy [abcjs](https://www.abcjs.net/) rendering ([abcjs](https://www.abcjs.net/) is the JS library that rendered all the other examples into HTML and CSS. This is why you can select the numbers on the tabs!)
+
+This is because staved tabs are not supported by [abcjs](https://www.abcjs.net/). On that matter, [abcjs](https://www.abcjs.net/) doesn't even let me manually determine the tabs for a note; it does this automatically and isn't always smart about it. (It's an exercise for the reader how I managed to render the two different fingerings in the first example. Hint: Changing tuning is supported.)
+
+This isn't a problem with [abcjs](https://www.abcjs.net/). In fact, I'm surprised [abcjs](https://www.abcjs.net/) even supports tabs, and is even pretty good at it. It's just that, in the current guitar notation world, most people are exposed to tabs in raw text form:
+
+```py
+import numpy as np
+```

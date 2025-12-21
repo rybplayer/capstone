@@ -1,7 +1,7 @@
 # Ryan Batubara's Website
 
-Todo:
-- Finish functional Python blog
-- Create proper nav
-- Make landing page
-- Import and subset fonts properly.
+How to run:
+`npm install`
+`npm run dev`
+
+DO NOT use bun. It breaks code blocks because of patched node modules.
