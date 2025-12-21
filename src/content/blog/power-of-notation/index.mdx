@@ -66,7 +66,7 @@ Here, `G4` needs to be played for half a beat, while `A4` needs to be played for
 X:1
 M:C
 L:1/8
-A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
+.A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
 `} />
 
 This creates a sort of tradeoff; you want the western notation for its precision in time, but you also want tablature for its precision in space (that is, where on the fretboard).
@@ -77,16 +77,78 @@ One solution to this conundrum is to just stave the tabs:
 
 <img src={Felicidade.src} class="w-[clamp(250px,50%,600px)] dark:invert" />
 
-Personally, I think this is quite elegant.
+Personally, I think this is quite the elegant solution. However, it's really not as simple as it seems.
 
 # The real problem with tabs
 
-Readers prone to inspect element will realize that this last staved tab is an `svg` rather than some fancy [abcjs](https://www.abcjs.net/) rendering ([abcjs](https://www.abcjs.net/) is the JS library that rendered all the other examples into HTML and CSS. This is why you can select the numbers on the tabs!)
+Readers prone to inspect element will realize that this last staved tab is an `svg` rather than some fancy [abcjs](https://www.abcjs.net/) rendering ([abcjs](https://www.abcjs.net/) is the JS library that rendered all the other examples into HTML and CSS. This is why you can highlight the numbers on the tabs!)
 
 This is because staved tabs are not supported by [abcjs](https://www.abcjs.net/). On that matter, [abcjs](https://www.abcjs.net/) doesn't even let me manually determine the tabs for a note; it does this automatically and isn't always smart about it. (It's an exercise for the reader how I managed to render the two different fingerings in the first example. Hint: Changing tuning is supported.)
 
 This isn't a problem with [abcjs](https://www.abcjs.net/). In fact, I'm surprised [abcjs](https://www.abcjs.net/) even supports tabs, and is even pretty good at it. It's just that, in the current guitar notation world, most people are exposed to tabs in raw text form:
 
-```py
-import numpy as np
 ```
+|----------------------|-----------------------|
+|----------------------|-----------------------|
+|---2-2--2-2--2-2--2-2-|--2-2--2-2--2-2--2-----|
+|---2-2--2-1--1-1--1-2-|--2-2--2-1--1-1--1-----|
+|-0--------------------|-----------------3p2---|
+|----------------------|---------------------0-|
+```
+
+Many sites like [Classtab](https://www.classtab.org/), [Acousterr](https://www.acousterr.com/), and much of [Ultimate Guitar](https://www.ultimate-guitar.com/) present sheet music exclusively through this text tab format. Some sites, namely [Songsterr](https://www.songsterr.com/a/wsa/metallica-master-of-puppets-tab-s455118), have implemented far more feature-rich, modern formatting, but started off as raw text too. 
+
+I'm not quite sure why this is the case, and my simple searches haven't found much discussion on why either. My guess is a combination of early internet, the ease of writing and storing text, and the fact that most guitar players only _really_ care about chords and don't really need any more from their notation.
+
+## The elephant in the room
+
+It's time to address the elephant in the room: "most guitar players only _really_ care about chords and don't really need any more from their notation." Is this even true?
+
+I'm not sure how to answer this question, or if there even is an answer to begin with. I'm certainly not qualified to give any sort of definitive answer to it, but I can at least discuss some personal experiences I've had with the matter.
+
+- One time, a friend of mine who knew I played guitar was shocked to see I played sheet music with tabs and single notes. He was of the conception that guitarists just "strum chords" and didn't play single notes like pianists.
+
+- Another time, a guitar player far more senior than myself expressed disdain for tabs, because of how ambiguous they are with timing. Apparently they had never seen staved tab notation before. They were immediately converted to tab-lovers upon this discovery.
+
+- Another friend of mine, and fellow guitar player, stated that they had never learned standard western notation. All this time, they relied on recordings to interpret tab timings.
+
+These experiences tell me that preference for notation is as much about context and availability as it is about the characteristics of the notation itself.
+
+## Towards a solution?
+
+On the other hand, many classical guitar transcribers actively advocate against the inclusion of tabs. Some of their arguments goes as follows: 
+
+<Callout title="An argument against tabs" variant="remark">
+Consider this passage:
+
+<AbcNotation abc={`
+X:1
+M:C
+L:1/8
+.A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
+`} />
+
+The tab can deceive the player into thinking they are playing on beat. Furthermore, there is so much ink on the page the player may forget the staccato marks. The western notation forces players to slow down and consider fingerings that best suit them. That is, the tab gives a false illusion of mastery.
+</Callout>
+
+I think that there is a lot that can be learned from such arguments. At the same time, I think such arguments make a lot of underlying assumptions that not all players may agree with. In particular, what if the player just wanted to skim the music while sight-playing? This can certainly be done with just the western notation, but I think adding the tab will almost certainly speed up this process.
+
+## The solution is choice, right?
+
+It's very tempting to conclude that choice is the solution. Just give both. Those who prefer one and dislike the other can just pretend the other does not exist.
+
+This is great in theory, but difficult in practice. A lot of this difficulty comes from translating between one notation and the other. Given western notation, there's a lot of choice involved in what strings and fingerings should be chosen to play them. Conversely, given tabs, there's a lot of freedom on how to time and accent the notes. (This all assumes there is no reference recording. But even if there is, best of luck transcribing it into either notation!)
+
+This is even worse if all you have is a pdf of the western notation or a text-based representation of the tab. A lot of manual work is necessary to make the conversion. A lot of AI tools exist out there that do this, but beyond identifying chords and overall melody, I don't see them getting very good anytime soon (I would not mind if they do though...).
+
+# The power of notation
+
+Personally, I would often stop learning a piece simply because either the western notation or tab was not available. I think this is especially true for more technically intricate pieces, where either notation struggles to give a full picture of what should be played.
+
+In such cases though, I don't think its fair to blame any notation. At the end of the day, notation is just a means to share music in a more accessible way. Rather than having to listen to a recording over and over again, a score presents a concise, searchable way to learn the piece. 
+
+Sometimes, there are pieces that you need to listen to to really get. Other times, there are pieces that look and sound completely impenetrable but become significantly easier with a score. At that point, I don't think it really matters whether the score is a tab or a stave. What matters is how much work and details were put into its construction.
+
+## Conclusions, and why this post exists
+
+I've always wanted to write this post to cope, in my own way, with the many, low quality scores of either notation (I'm looking at you, text-based tab websites...). Writing this, I realize this is not the issue. I just want someone to make high quality scores of the pieces I want to learn, regardless of notation!
