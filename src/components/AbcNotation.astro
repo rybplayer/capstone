@@ -1,0 +1,57 @@
+---
+const {
+  abc,
+  instrument = "guitar",
+  staffWidth = 270,
+  minWidthPx = 200,
+  maxWidthPx = 600,
+  maxWidthPercent = "50",
+  tuning = '["E,", "A,", "D", "G", "B", "e"]',
+} = Astro.props;
+---
+
+<div
+  class="abc-wrapper"
+  style={`width: clamp(${minWidthPx}px, ${parseInt(maxWidthPercent)}%, ${maxWidthPx}px); margin: 0 auto;`}
+>
+  <abc-notation 
+    data-abc={abc} 
+    data-instrument={instrument} 
+    data-staffwidth={staffWidth}
+    data-tuning={tuning}
+  ></abc-notation>
+</div>
+
+<script>
+import abcjs from "abcjs";
+
+class AbcNotation extends HTMLElement {
+  connectedCallback() {
+    const abc = this.dataset.abc || "";
+    const instrument = this.dataset.instrument;
+    const staffWidth = parseInt(this.dataset.staffwidth || "150");
+    const tuning = JSON.parse(this.dataset.tuning || '[]')
+
+    console.log("HERE")
+    console.log(tuning)
+
+    const options: any = {
+      selectionColor: "default",
+      responsive: "resize",
+      expandToWidest: true,
+      staffwidth: staffWidth,
+    };
+
+    if (instrument === "guitar") {
+      options.tablature = [{ 
+        instrument: "guitar",
+        tuning: tuning,
+      }];
+    }
+
+    abcjs.renderAbc(this, abc, options);
+  }
+}
+
+customElements.define("abc-notation", AbcNotation);
+</script>

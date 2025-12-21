@@ -166,8 +166,8 @@ const { title, variant = 'note', defaultOpen = true, ...rest } = Astro.props
       class={cn('mr-2 size-4 shrink-0', calloutConfig[variant].textColor)}
     />
     <span class={cn('font-medium mr-2', calloutConfig[variant].textColor)}>
-      {capitalize(variant)}
-      {title && <span class="font-normal opacity-70"> ({title})</span>}
+      {}
+      {title && <span class="font-medium"> {title}</span>}
     </span>
     <Icon
       name="lucide:chevron-down"
