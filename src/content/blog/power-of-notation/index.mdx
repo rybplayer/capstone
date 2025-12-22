@@ -1,27 +1,30 @@
 ---
 title: 'The Power of Notation'
 description: 'What the guitar music notation debate teaches us about notation in general.'
-date: 2025-09-26
+date: 2025-12-20
 tags: ['music']
 image: './power_of_notation.png'
 previewImage: './power_of_notation_preview.png'
 authors: ['Ryan Batubara']
 ---
 
-import AbcNotation from '@/components/AbcNotation.astro';
-import Felicidade from './Felicidade.svg';
+import AbcNotation from '@/components/AbcNotation.astro'
+import Felicidade from './Felicidade.svg'
 import Callout from '@/components/Callout.astro'
 
 # What is musical notation?
 
 There are all sorts of [musical notation](https://en.wikipedia.org/wiki/Musical_notation). Many people are perhaps familiar with [Western musical notation](https://en.wikipedia.org/wiki/List_of_musical_symbols):
 
-<AbcNotation abc={`
+<AbcNotation
+  abc={`
 X:2
 M:C
 L:1/4
 GABc |
-`} instrument='piano'/>
+`}
+  instrument="piano"
+/>
 
 In [scientific pitch notation](https://en.wikipedia.org/wiki/Scientific_pitch_notation), the above denotes playing notes `G4`, `A4`, `B4`, and `C5` for one beat each. In [solfège](https://en.wikipedia.org/wiki/Solf%C3%A8ge), this would be `sol`, `la`, `ti`, `do` for one beat each. Regardless of what notation you use, notation essentially boils down to what is played when.
 
@@ -29,23 +32,28 @@ In [scientific pitch notation](https://en.wikipedia.org/wiki/Scientific_pitch_no
 
 For those who play fretted instruments such as the guitar, an alternative notation called [tablature](https://en.wikipedia.org/wiki/Tablature) (or [tab](https://en.wikipedia.org/wiki/Tablature) for short) may also be familiar:
 
-<AbcNotation abc={`
+<AbcNotation
+  abc={`
 X:1
 M:C
 L:1/4
 GABc |
-`}/>
+`}
+/>
 
 In tabs, frets of a stringed instrument are used to denote what notes are played. Here a guitar, tuned to `E3 A3 D4 G4 B4 E5` from bottom to top, is used as reference. For example, `B4` corresponds to fret `0` (i.e. the open, unfretted string) of the string `B4`. `C4` corresponds to fret `1` of the same string, because it's the next note up in [12 equal temperament](https://en.wikipedia.org/wiki/12_equal_temperament).
 
 One of the major advantages of tabs is that it shows not only _what_ notes to play, but also _where_ to play them. For example, consider this alternative fingering:
 
-<AbcNotation abc={`
+<AbcNotation
+  abc={`
 X:1
 M:C
 L:1/4
 GABc |
-`} tuning={'["D,", "A,", "D", "G", "e", "f"]'} />
+`}
+  tuning={'["D,", "A,", "D", "G", "e", "f"]'}
+/>
 
 Here, the same four notes are played on the `G4` string, and the `B4` string is unused. Without adding to the western notation, we are unable to differentiate between the two examples. After all, they play the same notes, just in different ways. This disambiguation of _where_ to play notes is for me tabs' biggest advantage compared to western notation.
 
@@ -53,21 +61,26 @@ Here, the same four notes are played on the `G4` string, and the `B4` string is 
 
 Though tabs tell you _where_ to play notes, it doesn't tell you _when_ to play them. Kind of. Consider this:
 
-<AbcNotation abc={`
+<AbcNotation
+  abc={`
 X:1
 M:C
 L:1/4
 G<A Bc |
-`} tuning={'["D,", "A,", "D", "G", "e", "f"]'} />
+`}
+  tuning={'["D,", "A,", "D", "G", "e", "f"]'}
+/>
 
 Here, `G4` needs to be played for half a beat, while `A4` needs to be played for one and a half beats. The western notation makes this precisely clear. The tabs just move the notes around so that the space between `0` and `2` is roughly half the space between `2` and `4`. This can get very ambiguous very quickly. For example, here is the opening bar of [Felicidade arr. Dyens](https://www.youtube.com/watch?v=pSF_Rzrw4V8):
 
-<AbcNotation abc={`
+<AbcNotation
+  abc={`
 X:1
 M:C
 L:1/8
 .A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
-`} />
+`}
+/>
 
 This creates a sort of tradeoff; you want the western notation for its precision in time, but you also want tablature for its precision in space (that is, where on the fretboard).
 
@@ -96,7 +109,7 @@ This isn't a problem with [abcjs](https://www.abcjs.net/). In fact, I'm surprise
 |----------------------|---------------------0-|
 ```
 
-Many sites like [Classtab](https://www.classtab.org/), [Acousterr](https://www.acousterr.com/), and much of [Ultimate Guitar](https://www.ultimate-guitar.com/) present sheet music exclusively through this text tab format. Some sites, namely [Songsterr](https://www.songsterr.com/a/wsa/metallica-master-of-puppets-tab-s455118), have implemented far more feature-rich, modern formatting, but started off as raw text too. 
+Many sites like [Classtab](https://www.classtab.org/), [Acousterr](https://www.acousterr.com/), and much of [Ultimate Guitar](https://www.ultimate-guitar.com/) present sheet music exclusively through this text tab format. Some sites, namely [Songsterr](https://www.songsterr.com/a/wsa/metallica-master-of-puppets-tab-s455118), have implemented far more feature-rich, modern formatting, but started off as raw text too.
 
 I'm not quite sure why this is the case, and my simple searches haven't found much discussion on why either. My guess is a combination of early internet, the ease of writing and storing text, and the fact that most guitar players only _really_ care about chords and don't really need any more from their notation.
 
@@ -116,19 +129,22 @@ These experiences tell me that preference for notation is as much about context 
 
 ## Towards a solution?
 
-On the other hand, many classical guitar transcribers actively advocate against the inclusion of tabs. Some of their arguments goes as follows: 
+On the other hand, many classical guitar transcribers actively advocate against the inclusion of tabs. Some of their arguments goes as follows:
 
 <Callout title="An argument against tabs" variant="remark">
 Consider this passage:
 
-<AbcNotation abc={`
+<AbcNotation
+  abc={`
 X:1
 M:C
 L:1/8
 .A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
-`} />
+`}
+/>
 
 The tab can deceive the player into thinking they are playing on beat. Furthermore, there is so much ink on the page the player may forget the staccato marks. The western notation forces players to slow down and consider fingerings that best suit them. That is, the tab gives a false illusion of mastery.
+
 </Callout>
 
 I think that there is a lot that can be learned from such arguments. At the same time, I think such arguments make a lot of underlying assumptions that not all players may agree with. In particular, what if the player just wanted to skim the music while sight-playing? This can certainly be done with just the western notation, but I think adding the tab will almost certainly speed up this process.
@@ -145,7 +161,7 @@ This is even worse if all you have is a pdf of the western notation or a text-ba
 
 Personally, I would often stop learning a piece simply because either the western notation or tab was not available. I think this is especially true for more technically intricate pieces, where either notation struggles to give a full picture of what should be played.
 
-In such cases though, I don't think its fair to blame any notation. At the end of the day, notation is just a means to share music in a more accessible way. Rather than having to listen to a recording over and over again, a score presents a concise, searchable way to learn the piece. 
+In such cases though, I don't think its fair to blame any notation. At the end of the day, notation is just a means to share music in a more accessible way. Rather than having to listen to a recording over and over again, a score presents a concise, searchable way to learn the piece.
 
 Sometimes, there are pieces that you need to listen to to really get. Other times, there are pieces that look and sound completely impenetrable but become significantly easier with a score. At that point, I don't think it really matters whether the score is a tab or a stave. What matters is how much work and details were put into its construction.
 
