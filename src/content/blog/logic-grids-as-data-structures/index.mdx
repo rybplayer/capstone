@@ -1,9 +1,443 @@
 ---
 title: 'Logic Grids as Data Structures'
 description: 'Or how grids solve murder mysteries, store information, and help us think.'
-date: 2025-09-25
+date: 2025-12-21
 tags: ['puzzle']
 image: './logic_grids_as_ds.png'
 previewImage: './logic_grids_as_ds_preview.png'
 authors: ['Ryan Batubara']
 ---
+
+import LogicPuzzle from '@/components/LogicGrid'
+import Spoiler from '@/components/Spoiler.astro'
+import Callout from '@/components/Callout.astro'
+import KeyDeductions from './KeyDeductions.png'
+import GardenPlots from './GardenPlots.png'
+import Montague from './Montague.png'
+
+# What's a logic grid?
+
+[Logic grids](https://logic.puzzlebaron.com/) are one of those things that best explained by starting with an example.
+
+<Callout title="An example logic grid puzzle" variant="puzzle">
+
+A logic grid typically presents a list of clues, such as:
+
+1. Amy's birthday is in April.
+2. Bintang is 7 years old.
+3. Chandra was born in September.
+4. Amy is 8 years old.
+
+These clues would be accompanied by a grid:
+
+<LogicPuzzle
+  client:only="react"
+  id="birthday-puzzle"
+  cellSize={30}
+  categories={[
+    ['Names', ['Amy', 'Bintang', 'Chandra']],
+    ['Ages', ['7', '8', '9']],
+    ['Birthdays', ['April', 'January', 'September']],
+  ]}
+/>
+
+</Callout>
+
+The player would then put ticks and crosses on the grid, solving for the birthdays and ages for all three characters. Of course, this is only possible if we assume all three characters have distinct birth months and ages; this assumption is usually implied in logic grids.
+
+Note that the above grid is **functional**; press the boxes to turn empty cells into crosses, crosses into ticks, and ticks back into empty cells. You can drag click too. Feel free to try it out! Open the following callout to reveal the solution:
+
+<Callout title="Example logic grid solution" variant="solution" defaultOpen={false}>
+
+Amy is 8 and born in April. \
+Bintang is 7 and born in January. \
+Chandra is 9 and born in September
+
+</Callout>
+
+## Formal description
+
+Formally, logic grids admit quite a concise description: Given $$c$$ categories, each with $$n$$ distinct elements, the player is given _clues_ about the categories and elements, leading to a _unique bijection_ between every pair of categories.
+
+For example, the [previous puzzle](#an-example-logic-grid-puzzle) has 3 categories, each with 3 elements, and 4 clues. The solution was a unique bijection between names and birthdays, birthdays and ages, and names and ages.
+
+Interestingly, logic grids are solvable in [polynomial time](https://en.wikipedia.org/wiki/Time_complexity), given "simple" clues, and other constraints! In fact, some solvers like [this paper](https://arxiv.org/pdf/1910.06636) can give provably correct, human-like reasoning for the solution, still in polynomial time!
+
+<Callout title="What about brute force?">
+
+Note that if you have $c$ categories each with $n$ elements, there are
+
+$$
+(n!)^{c-1}
+$$
+
+possible bijections to brute force, since
+
+1. Fixing a category's $n$ elements, the first element has $n$ choices to map into another category, the second $n-1$, and so on, so $n!$ bijections between any two categories of equal size $n$.
+2. Repeat step 1 $c-1$ times, pairing up with a new category each time. Any remaining bijection(s) are uniquely determined by composing the existing bijections.
+
+In other words, polynomial time is quite efficient!
+
+</Callout>
+
+## Useless logic grids?
+
+So we have
+
+1. Polynomial-time solvers
+2. Explainable solvers
+3. Probably correct answers
+
+These are all _very nice_ properties for a problem class to have. (I won't go into _why_ these properties hold here. I refer interested readers to [this paper](https://arxiv.org/pdf/1910.06636).)
+
+At the same time, you can say that logic grids are kind of "useless." You need:
+
+1. All categories known and unique.
+2. All elements known and unique.
+3. All clues correct.
+4. Non contradicting clues.
+5. Clues result in a (unique) solution.
+
+If you knew all 5 above statements were true, you know so much about the problem you _kind of_ already have the answer!
+
+# Useful Logic Grids
+
+Logic grids may have a lot of constraints, but they're useful for solving puzzles that satisfies those constraints. Even when the puzzle does not look like it can be solved with a logic grid. For example, consider the following problem:
+
+<Callout title="Key deductions" variant="puzzle">
+
+You are given 12 locked boxes. They all require different keys to be opened, and there are no duplicate keys.
+
+<img
+  src={KeyDeductions.src}
+  class="w-[clamp(250px,50%,600px)] py-6 dark:invert"
+/>
+
+You are given keys to boxes 1, 2, and 3, which are not in any other box. Besides boxes 1, 2, and 3, 6 of the other boxes contain a single key, while two of the remaining contain nothing and the third a prize.
+
+**Which box, 1, 2, or 3, when opened leads to a sequence of keys and openings that gives you the prize?** The longest sequence of boxes, starting from box 1, 2, or 3, ends with the box with the prize. All keys are retrievable.
+
+This puzzle was taken from [_Return to Montague Island_, puzzle 1.1](https://www.amazon.com/Return-Montague-Island-Mysteries-Puzzles/dp/1454933933) by R. W. Schmittberger.
+
+</Callout>
+
+Personally, a lot of the difficulty of this puzzle comes from figuring out how to effectively structure the given information. It's tempting to create a graph with 12 vertices, whose directed edges represent the potential keys. Perhaps, some sort of graph traversal can get us the answer.
+
+Unfortunately, this graph strategy doesn't work so easily. In particular, since all keys are retrievable and unique, you need to visit all boxes (vertices) in the graph. At the same time, you have three starting positions to consider and at every point you have up to two choices of where to go next.
+
+Perhaps there is a more clever graph representation and algorithm for this problem. But as we'll soon see, logic grids make problem feel trivial. Please open the callout below to see the logic grid solution:
+
+<Callout title="Key deductions solution" variant="solution" defaultOpen={false}>
+
+Construct the following grid:
+
+<LogicPuzzle
+  client:only="react"
+  id="key-deductions"
+  cellSize={30}
+  categories={[
+    ['Boxes', Array.from({ length: 12 }, (_, i) => `${i + 1}`)],
+    [
+      'Contents',
+      [
+        'prize',
+        'empty',
+        'empty',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '12',
+      ],
+    ],
+  ]}
+/>
+
+Put crosses on every cell that violates the clues on the boxes. Doing so, you may discover:
+
+1. Box 4 must contain the key to box 12, since it is found nowhere else.
+2. Box 12 cannot contain the key to box 4, else both boxes would not be retrievable. Thus box 12 contains the key to box 8.
+3. Then box 3 contains the key to box 7.
+4. Then box 11 contains the key to box 9.
+5. Then box 9 contains the key to box 10.
+6. If box 10 contained the key to box 11, then box 9,10,11 would form a loop, so box 10 must contain the key to box 6.
+7. Also, box 2 contains the key to box 5.
+8. Furthermore, box 1 has the key to box 4.
+9. Then box 5 has the key to box 11.
+10. Boxes 6,7,8 are empty.
+11. Starting with box 2 leads to boxes 5, 11, 9, 10, and 6, which is the longest sequence. Thus the prize is in box 6.
+
+It's a lot of steps, but many of them (especially step 1) become trivially obvious with the logic grid. Furthermore, you can actually save space by constructing the following grid:
+
+<LogicPuzzle
+  client:only="react"
+  id="key-deductions-minimal"
+  cellSize={30}
+  categories={[
+    ['Boxes', Array.from({ length: 12 }, (_, i) => `${i + 1}`)],
+    ['Contents', ['contents']],
+  ]}
+  values={[
+    '4 \n 10',
+    '5 \n 6',
+    '7 \n 8',
+    '10 \n 12',
+    '11 \n ∅',
+    '5 \n ∅',
+    '9 \n ∅',
+    '10 \n ∅',
+    '7 \n 10',
+    '6 \n 11',
+    '8 \n 9',
+    '4 \n 8',
+  ]}
+/>
+
+Namely, fill each cell with the two possible outcomes of each box, and cross out the ones you deduce are incorrect.
+
+</Callout>
+
+# Useless logic grids
+
+<Callout title="Who's the liar?" variant="puzzle">
+
+Fatima and Amara come from a land where
+some always tell the truth, and the rest always lie.
+
+Amara says, “Either Fatima lies, or I am truthful.”
+
+Are Fatima and/or Amara liars?
+
+</Callout>
+
+Usually, we solve puzzles like this using a truth table. Can we use a logic grid? What should the grid be? Something like this?
+
+<LogicPuzzle
+  client:only="react"
+  id="whos-the-liar-1"
+  cellSize={30}
+  categories={[
+    ['Name', ['Fatima', 'Amara']],
+    ['Status', ['Liar', 'Truthful']],
+    ['Status', ['Liar', 'Truthful']],
+  ]}
+/>
+
+Or maybe something like this?
+
+<LogicPuzzle
+  client:only="react"
+  id="whos-the-liar-2"
+  cellSize={30}
+  categories={[
+    [
+      'Possibilities 1',
+      ['Amara Truthful', 'Amara Lying', 'Fatima Truthful', 'Fatima Lying'],
+    ],
+    [
+      'Possibilities 2',
+      ['Amara Truthful', 'Amara Lying', 'Fatima Truthful', 'Fatima Lying'],
+    ],
+  ]}
+/>
+
+Solution spoiler alert! Fatima is <Spoiler>truthful</Spoiler> and Amara is <Spoiler>truthful</Spoiler>. So can't we just do:
+
+<LogicPuzzle
+  client:only="react"
+  id="whos-the-liar-1"
+  cellSize={30}
+  categories={[
+    ['Name', ['Fatima', 'Amara']],
+    ['Status', ['Liar', 'Truthful']],
+  ]}
+  values={['✗', '✓', '✗', '✓']}
+/>
+
+Recall that in the [key deductions](#key-deductions) puzzle, we used the fact that a tick mark causes crosses to appear in all cells that share a row or column with the tick in the same category. If we allowed multiple tick marks in each row or column, we would lose out on this trick. Do logic grids even work when we allow multiple ticks like this?
+
+# Non-bijective logic grids
+
+Recall that logic grids need:
+
+1. All categories known and unique.
+2. All elements known and unique.
+3. All clues correct.
+4. Non contradicting clues.
+5. Clues result in a (unique) solution.
+
+We try to relax 1 and 2 to:
+
+1. All categories known.
+2. All elements known.
+
+Interestingly, the logic grid remains an incredibly effective way to encode information! (More formally, the polynomial time properties from earlier still hold with some minor caveats, though the proof of this is far beyond the capacity of this blog post. It essentially boils down to a polynomial time reduction.)
+
+For example, here's the grid for [_Montague Island Mysteries_, puzzle 4.4](https://www.amazon.com/Montague-Island-Mysteries-Other-Puzzles/dp/145491811X) that I solved the other day:
+
+<img src={GardenPlots.src} class="w-[clamp(200px,50%,1000px)] dark:invert" />
+
+# Lying logic grids
+
+We now only need:
+
+1. All categories known.
+2. All elements known.
+3. All clues correct.
+4. Non contradicting clues.
+5. Clues result in a (unique) solution.
+
+We try to relax 3, 4, 5:
+
+3. Clues may be incorrect, but it is known how many are incorrect.
+4. Clues may contradict.
+5. Clues may result in no solution, but there exists a subset of clues that result in a solution, satisfying at least the number of known correct clues.
+
+Let's explore what these mean through a puzzle.
+
+<Callout title="Murder mystery" variant="puzzle">
+
+A murder has occurred! Alistair the butler is innocent, but one of the staff and one of the guests are guilty! The guilty party's statements cannot be trusted. All other statements are true!
+
+**Staff statements**
+
+1. **Alistair**: Either Jessica is innocent, Evelyn and Sandy are both innocent, or all three are innocent.
+2. **Evelyn**: If Beth is guilty, then so is either Grant or Lyle. If Jessica is guilty, then Grant and Lyle are innocent.
+3. **Grant**: If Molly or Sandy is guilty, then Beth, Charles, and Karen are innocent. If Lyle is guilty, then David, Frank, and Jessica are innocent.
+4. **Lyle**: If Evelyn is guilty, her accomplice is David, Frank, or Jessica.
+5. **Molly**: If Frank is guilty, his accomplice is either David or Evelyn. If Karen is guilty, her accomplice is Grant or Lyle; but if David is guilty, Grant and Lyle are innocent.
+6. **Sandy**: If Charles is guilty, then so is either Grant or Lyle. If Grant is guilty, then David, Frank, and Jessica are innocent.
+
+**Guest statements**
+
+7. **Beth**: If Evelyn is guilty, then David and Frank are innocent. If Molly is guilty, then David and Jessica are innocent.
+8. **Charles**: If Sandy is guilty, then David and Frank are innocent.
+9. **David**: If Beth is guilty, her accomplice is not Grant or Lyle. If David is guilty, his accomplice is not Evelyn or Sandy.
+10. **Frank**: If Grant or Lyle is guilty, then Beth and Karen are innocent. If Molly is guilty, then her accomplice is Beth, Charles, or Karen.
+11. **Jessica**: If Grant or Lyle is guilty, then Charles and Karen are innocent.
+12. **Karen**: If Charles is guilty, his accomplice is either Evelyn, Molly, or Sandy. If Frank is guilty, Evelyn and Sandy are innocent.
+
+This puzzle is from [_Montague Island Mysteries_, puzzle 12.4](https://www.amazon.com/Montague-Island-Mysteries-Other-Puzzles/dp/145491811X).
+
+</Callout>
+
+At first glance, this puzzle looks daunting. There are 12 different parties. Each of them gives up to two statements, and these statements involve "and", "or", and "if." It feels like there's no solid ground to start on.
+
+At this point, you've probably guessed that logic grids can be used to solve this problem. This is a post about logic grids, after all. Indeed, a _very_ clever logic grid can be used to solve this problem. Here's a pretty big hint: <Spoiler> If a statement is corroborated by two or more guests (or staff, respectively), it must be true. </Spoiler>
+
+Please expand the callout below for the full solution.
+
+<Callout title="Murder mystery solution" variant="solution" defaultOpen={false}>
+
+Construct the following grid:
+
+<LogicPuzzle
+  client:only="react"
+  id="key-deductions"
+  cellSize={30}
+  categories={[
+    ['Staff', ['Evelyn', 'Grant', 'Lyle', 'Molly', 'Sandy']],
+    ['Guests', ['Beth', 'Charles', 'David', 'Frank', 'Jessica', 'Karen']],
+  ]}
+/>
+
+Note that we exclude Alistair because we already know he's innocent. Place an S in each cell whenever a staff member has made a statement ruling out that staff-guest pair. Place a G if a guest has done so.
+
+Whenever a cell contains more than 2 "S" or 2 "G", counting them separately, then that pairing is impossible. Otherwise, there would be more than one liar in the staff or guest category.
+
+Doing this repeatedly will reveal other certainly innocent staff and guests. In the end, every pairing bu one can be eliminated by this method. The exception is <Spoiler>Molly and Frank</Spoiler> whose statements eliminate their own pairing but is never corroborated. They are the guilty pair.
+
+We can generalize this technique; If there are $k$ liars in a category, find all claims corroborated by $k+1$ claims in the category. Repeat this, taking account of any new information deduced.
+
+</Callout>
+
+I hope you found the above puzzle as interesting and fun as I do. I honestly think it's a really elegant trick, but one question did linger for me: What if the number of liars is unknown?
+
+# Bounded lying logic grids
+
+We now only need:
+
+1. All categories known.
+2. All elements known.
+3. Clues may be incorrect, but it is known how many are incorrect.
+4. Clues may contradict.
+5. Clues may result in no solution, but there exists a subset of clues that result in a solution, satisfying at least the number of known correct clues.
+
+Let's try to relax 3 further:
+
+3. Clues may be incorrect, but there is a non-maximal bound on how many are incorrect.
+
+Once again, lets explore what the new condition 3 means through an example.
+
+<Callout title="Pilfer puzzle" variant="puzzle">
+
+A robbery has occurred in the same mansion! Fewer than 4 guests were the thieves. Their statements may be true or false. All other statements are true! Police investigation has also shown that neither Danny nor Brianna makes a true statement unless he or she is innocent.
+
+1. **Aria**: Either Brianna or Cheryl is guilty, but not both.
+2. **Brianna**: Cheryl is innocent, and there were three thieves.
+3. **Cheryl**: Steven is innocent, and there were three thieves.
+4. **Danny**: Either Kelly or Steven is guilty, but not both.
+5. **Kelly**: I am innocent, and there were two thieves.
+6. **Steven**: I am innocent, and there were three thieves.
+7. **Taylor**: Either Aria or Danny is lying, but not both.
+
+This puzzle is from [_Beyond Montague Island_, puzzle 9.1](https://www.amazon.com/Beyond-Montague-Island-Mysteries-Puzzles/dp/1454936592).
+
+</Callout>
+
+Here are some hints:
+
+{/* prettier-ignore */}
+1. <Spoiler>There is a fast way to find out the # of thieves.</Spoiler>
+{/* prettier-ignore */}
+2. <Spoiler>Start with Danny and Brianna's clues first. Why would you want to do this?</Spoiler>
+{/* prettier-ignore */}
+3. <Spoiler>At least one of the thieves is not lying; this thief must be identified through elimination.</Spoiler>
+
+Please expand the callout below for the full solution.
+
+<Callout title="Pilfer puzzle solution" variant="solution" defaultOpen={false}>
+
+Consider the bolded parts below:
+
+1. Aria: Either Brianna or Cheryl is guilty, but not both.
+2. Brianna: Cheryl is innocent, and there were **three thieves**.
+3. Cheryl: Steven is innocent, and there were **three thieves**.
+4. Danny: Either Kelly or Steven is guilty, but not both.
+5. Kelly: I am innocent, and there were **two thieves**.
+6. Steven: I am innocent, and there were **three thieves**.
+7. Taylor: **Either Aria or Danny is lying**, but not both.
+
+By proof of contradiction, there are **three thieves**, else there are more false statements than thieves. Repeating the same technique from the [previous problem](#murder-mystery), we find that Aria, Kelly, and Taylor are the thieves.
+
+Notice what we just did: We first tried to map the problem into a type of logic grid we knew how to solve, i.e. known number of liars logic grids. At that point, we can just reuse previous techniques to solve the problem.
+
+</Callout>
+
+# Conclusions
+
+We started from a constrained problem, then generalized:
+
+Bijective LGs → Non-bijective LGs → Lying LGs → Bounded lying LGs
+
+Every time, our first instinct was to try and map the problem back into a logic grid class we've already seen. In doing so, we found a relatively powerful puzzle-solving algorithm, or more loosely, a data structure for organizing puzzle-esque information.
+
+## The Montague series
+
+Many of the puzzles from this talk come from the following books:
+
+<a href="https://www.hachettebookgroup.com/series/r-wayne-schmittberger/montague-island-mysteries/">
+  <img
+    src={Montague.src}
+    class="w-[clamp(200px,80%,1000px)]"
+    alt="Montague Island Puzzle Book Series"
+  />
+</a>
+
+If you enjoyed them, (I certainly do!), I highly recommend getting a copy. They're surprisingly cheap and very well made. I am not sponsored. Sadly, the author has passed and is no longer with us.
+
+I hope this post has been an enjoyable read. If you have any questions, concerns, or additions, please feel free to [reach out](/)!
