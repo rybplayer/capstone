@@ -1,0 +1,20 @@
+---
+
+---
+
+<span class="spoiler" onclick="this.classList.toggle('revealed')"><slot /></span
+>
+
+<style>
+  .spoiler {
+    background-color: oklch(from var(--foreground) l c h / 0.3);
+    color: transparent;
+    cursor: pointer;
+    padding: 0 0.2em;
+    border-radius: 0.2em;
+  }
+  .spoiler.revealed {
+    background-color: transparent;
+    color: inherit;
+  }
+</style>
