@@ -124,9 +124,12 @@ const calloutConfig = {
     textColor: 'text-sky-700 dark:text-sky-300',
     icon: 'lucide:list',
   },
+  puzzle: {
+    style: 'border-lime-900 dark:border-lime-600',
+    textColor: 'text-lime-900 dark:text-lime-600',
+    icon: 'lucide:puzzle',
+  },
 } as const
-
-const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
 
 const calloutVariants = cva('relative px-4 py-3 my-6 border-l-4 text-sm', {
   variants: {
@@ -144,12 +147,29 @@ interface Props extends VariantProps<typeof calloutVariants> {
   class?: string
   variant?: keyof typeof calloutConfig
   defaultOpen?: boolean
+  id?: string
 }
 
-const { title, variant = 'note', defaultOpen = true, ...rest } = Astro.props
+function slugify(str: string) {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+}
+
+const {
+  title,
+  variant = 'note',
+  defaultOpen = true,
+  id: explicitId,
+  ...rest
+} = Astro.props
+const derivedId = explicitId ?? (title ? slugify(title) : undefined)
 ---
 
 <details
+  id={derivedId}
   class={cn(
     calloutVariants({ variant }),
     rest.class,
