@@ -108,83 +108,87 @@ function LogicPuzzle({
   return (
     <div className="my-6 overflow-x-auto">
       <table>
-        <tr>
-          <td style={empty} />
-          <td style={empty} />
-          {colCats.map((cat) => (
-            <th
-              key={cat}
-              colSpan={cats[cat]!.length}
-              className={`${b} ${txt} text-center font-bold`}
-              style={h}
-            >
-              {cat}
-            </th>
-          ))}
-        </tr>
-        <tr>
-          <td style={empty} />
-          <td style={empty} />
-          {colItems.map((col, i) => (
-            <th
-              key={i}
-              className={`${b} ${txt} rotate-180 font-normal [writing-mode:vertical-rl]`}
-              style={w}
-            >
-              {col.item}
-            </th>
-          ))}
-        </tr>
-        {rowItems.map((r, ri) => {
-          const validColCount = colCats
-            .slice(0, r.idx)
-            .reduce((sum, cat) => sum + cats[cat]!.length, 0)
-          return (
-            <tr key={ri}>
-              {r.isFirst && (
-                <th
-                  rowSpan={r.catLen}
-                  className={`${b} ${txt} rotate-180 text-center font-bold [writing-mode:vertical-rl]`}
-                  style={w}
-                >
-                  {r.cat}
-                </th>
-              )}
+        <thead>
+          <tr>
+            <td style={empty} />
+            <td style={empty} />
+            {colCats.map((cat) => (
               <th
-                className={`${b} ${txt} width-dynamic text-right font-normal whitespace-nowrap`}
-                style={{ height: s }}
+                key={cat}
+                colSpan={cats[cat]!.length}
+                className={`${b} ${txt} text-center font-bold`}
+                style={h}
               >
-                {r.item}
+                {cat}
               </th>
-              {colItems.slice(0, validColCount).map((_, ci) => {
-                const linearIndex = (cellsBeforeRow[ri] ?? 0) + ci
-                const providedValue = values?.[linearIndex]
-                const val =
-                  providedValue !== undefined && providedValue !== ''
-                    ? providedValue
-                    : state[`${ri}:${ci}`] || ''
-                return (
-                  <td
-                    key={ci}
-                    onMouseDown={() => handleMouseDown(ri, ci)}
-                    onMouseEnter={() => handleMouseEnter(ri, ci)}
-                    className={`${b} ${txt} text-center align-middle whitespace-pre-line select-none ${isReadOnly ? '' : 'hover:bg-muted cursor-pointer'}`}
-                    style={{ ...w, ...h }}
+            ))}
+          </tr>
+          <tr>
+            <td style={empty} />
+            <td style={empty} />
+            {colItems.map((col, i) => (
+              <th
+                key={i}
+                className={`${b} ${txt} rotate-180 font-normal [writing-mode:vertical-rl]`}
+                style={w}
+              >
+                {col.item}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rowItems.map((r, ri) => {
+            const validColCount = colCats
+              .slice(0, r.idx)
+              .reduce((sum, cat) => sum + cats[cat]!.length, 0)
+            return (
+              <tr key={ri}>
+                {r.isFirst && (
+                  <th
+                    rowSpan={r.catLen}
+                    className={`${b} ${txt} rotate-180 text-center font-bold [writing-mode:vertical-rl]`}
+                    style={w}
                   >
-                    {val === '✓' ? (
-                      <span className="text-primary">{val}</span>
-                    ) : (
-                      val
-                    )}
-                  </td>
-                )
-              })}
-              {colItems.slice(validColCount).map((_, ci) => (
-                <td key={ci} style={empty} />
-              ))}
-            </tr>
-          )
-        })}
+                    {r.cat}
+                  </th>
+                )}
+                <th
+                  className={`${b} ${txt} width-dynamic text-right font-normal whitespace-nowrap`}
+                  style={{ height: s }}
+                >
+                  {r.item}
+                </th>
+                {colItems.slice(0, validColCount).map((_, ci) => {
+                  const linearIndex = (cellsBeforeRow[ri] ?? 0) + ci
+                  const providedValue = values?.[linearIndex]
+                  const val =
+                    providedValue !== undefined && providedValue !== ''
+                      ? providedValue
+                      : state[`${ri}:${ci}`] || ''
+                  return (
+                    <td
+                      key={ci}
+                      onMouseDown={() => handleMouseDown(ri, ci)}
+                      onMouseEnter={() => handleMouseEnter(ri, ci)}
+                      className={`${b} ${txt} text-center align-middle whitespace-pre-line select-none ${isReadOnly ? '' : 'hover:bg-muted cursor-pointer'}`}
+                      style={{ ...w, ...h }}
+                    >
+                      {val === '✓' ? (
+                        <span className="text-primary">{val}</span>
+                      ) : (
+                        val
+                      )}
+                    </td>
+                  )
+                })}
+                {colItems.slice(validColCount).map((_, ci) => (
+                  <td key={ci} style={empty} />
+                ))}
+              </tr>
+            )
+          })}
+        </tbody>
       </table>
     </div>
   )

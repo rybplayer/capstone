@@ -1,0 +1,53 @@
+---
+title: 'The Technicals'
+description: ''
+date: 2025-12-22
+tags: ['programming']
+authors: ['Ryan Batubara']
+---
+
+import Callout from '@/components/Callout.astro'
+
+## Why Astro?
+
+From the start I knew I wanted [Astro](https://astro.build/) as my web framework. There were three main reasons for this:
+
+1. **UI-agnostic.** Astro allows you to use React, Svelte, Vue, Solid, etc all in one site. As someone new to web development, this means I can try all the UI frameworks without committing to one early on.
+
+2. **Server-first.** In Astro, the server renders as much content into HTML as possible. This is ideal for static sites like blogs.
+
+3. **Islands architecture.** Astro separates each page into different islands or components, each of which can be static or interactive and use almost any UI framework. This is performant while allowing me to choose the best framework for each component.
+
+I didn't want to start from nothing, so I went through every blog template on [Astro themes](https://astro.build/themes). [Erudite](https://github.com/jktrn/astro-erudite) was the best fit at the time.
+
+<Callout title="An anecdote on Erudite" variant="note" defaultOpen={false}>
+
+[Erudite](https://github.com/jktrn/astro-erudite) claims to be loosely inspired by [Astro Micro](https://astro-micro.vercel.app/), which was a fork of [Astro Nano](https://astro.build/themes/details/astronano/). Astro Nano was actually my second choice template, since it had precisely the bare minimum for a quality blog and nothing more. Astro Micro added search, comments, and other features to Astro Nano, alongside a visual overhaul. For me, Erudite took the best principles of Nano and Micro, got rid of everything else, and added the ideal post navigation system.
+
+Two examples solidified my choice of Erudite over every other template. [Enscribe](https://enscribe.dev/), the creator of Erudite, has a [blog](https://enscribe.dev/blog) that exemplifies Erudite's potential as a technical blog. [Reza Rezvan's](https://rezarezvan.com/) [blog](https://rezarezvan.com/notes/) exemplifies Erudite's potential as an academic blog. He's also the original author of the `<Callout>` component in this template.
+
+Since then, I've actually gotten in touch with Enscribe, who ended up being very influential in determining the color palette for this site and getting me to use [Figma](https://www.figma.com/).\
+
+</Callout>
+
+## The tech stack
+
+[Astro](https://astro.build/) is the web framework. The primary UI library is [shadcn](https://ui.shadcn.com/) so [Tailwind](https://tailwindcss.com/) is also used. The site is 100% [TypeScript](https://www.typescriptlang.org/). Most components are vanilla Astro, but more complex ones are in [React](https://react.dev/), to be replaced by [Svelte](https://svelte.dev/) when LLMs get better at writing Svelte. The site is hosted on Github through [Github pages](https://docs.github.com/en/pages).
+
+The flowchart for a typical blog post is:
+
+1. Brainstorming a topic. Surprisingly the easiest part.
+
+2. Making the post's banner art in [Figma](https://www.figma.com/). This is second because I find illustrating forces me to concretely narrow down the topic in a way text cannot do.
+
+3. Writing directly in `.mdx` using an IDE. This takes the most time.
+
+4. Making custom components for the post. It's my unspoken rule to always make a new component for every post, both to practice and to give each post some individuality.
+
+5. All this is done in a Github [branch](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches). When the first draft is ready, I make a pull request. If a post needs edits after that, I do it in the same branch and PR it back into main.
+
+The Git branches allow me trace what post inspired what change, and work on multiple posts simultaneously.
+
+## On media
+
+I try to store all images in [WebP](https://en.wikipedia.org/wiki/WebP) if its not a vector and [SVG](https://en.wikipedia.org/wiki/SVG) if it is. I'm having doubts about SVG though. Inspect the blog post banner file size and you'll see why. I hope to never upload a video or large media file directly here, providing links to an external service instead.

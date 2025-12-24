@@ -1,6 +1,6 @@
 ---
 import { SITE } from '@/consts'
-import { isSubpost } from '@/lib/data-utils'
+import { getParentPost, isSubpost } from '@/lib/data-utils'
 import type { CollectionEntry } from 'astro:content'
 
 interface Props {
@@ -9,22 +9,29 @@ interface Props {
 
 const { post } = Astro.props
 
+const parentPost = isSubpost(post.id) ? await getParentPost(post.id) : null
+
 const title = post.data.title || SITE.title
-const description = post.data.description || SITE.description
+const description =
+  post.data.description || parentPost?.data.description || SITE.description
 const image = new URL('/static/1200x630.png', Astro.site)
 const author =
   post.data.authors && post.data.authors.length > 0
     ? post.data.authors.join(', ')
     : SITE.author
 
-// Use preview image for Open Graph if available, otherwise fallback to regular image
 let ogImage = image
 if (post?.data?.previewImage?.src) {
-  // Use the dedicated preview image for Open Graph
   ogImage = new URL(`${SITE.href}${post.data.previewImage.src}`, Astro.site)
 } else if (post?.data?.image?.src) {
-  // Fallback to regular image
   ogImage = new URL(`${SITE.href}${post.data.image.src}`, Astro.site)
+} else if (parentPost?.data?.previewImage?.src) {
+  ogImage = new URL(
+    `${SITE.href}${parentPost.data.previewImage.src}`,
+    Astro.site,
+  )
+} else if (parentPost?.data?.image?.src) {
+  ogImage = new URL(`${SITE.href}${parentPost.data.image.src}`, Astro.site)
 }
 ---
 

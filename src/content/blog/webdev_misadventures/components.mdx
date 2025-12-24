@@ -1,0 +1,76 @@
+---
+title: 'Components'
+description: ''
+date: 2025-12-22
+tags: ['programming']
+authors: ['Ryan Batubara']
+---
+
+import CalloutShowcase from '@/components/CalloutShowcase.astro'
+import Callout from '@/components/Callout.astro'
+import AbcNotation from '@/components/AbcNotation.astro'
+import LogicPuzzle from '@/components/LogicGrid'
+
+## How to use components
+
+Within any `.mdx`, import the component and pass in the required parameters. For example, here's how to add a `<Callout>` component.
+
+```mdx
+import Callout from '@/components/Callout.astro'
+
+<Callout title="About callouts" variant="important" defaultOpen={false}>
+  Callouts signify different types of content to the reader
+</Callout>
+```
+
+Here's how it looks rendered. Notice `defaultOpen={false}` makes the callout closed by default, ideal for e.g. solutions to puzzles.
+
+<Callout title="About callouts" variant="important" defaultOpen={false}>
+  Callouts signify different types of content to the reader
+</Callout>
+
+I can then call out the component as a [hyperlink](#about-callouts). Here's how this line looks in code:
+
+```mdx
+I can then call out the component as a [hyperlink](#about-callouts).
+```
+
+By default, the callout's `id` is just its slugified title, but a custom `id` can be passed in too.
+
+## Callouts
+
+Callout color and icons are data driven, so it's easy to add a bunch of varieties:
+
+<CalloutShowcase></CalloutShowcase>
+
+## Post-specific components
+
+Almost every post has a custom callout made just for it. For example, here's a music sheet component using [abcjs](https://www.abcjs.net/) with [tablature](https://en.wikipedia.org/wiki/Tablature) support:
+
+<AbcNotation
+  abc={`
+X:1
+M:C
+L:1/8
+.A, .[AE].[AE]/2 z/2 .[AE].[A^D]/2 z/2 .[A^D].[A^D]/2 z/2 .[A^D].[AE]/2 z/2 |
+`}
+/>
+
+Sidenote: [abcjs](https://www.abcjs.net/) can actually compile sheets to audio, have the user edit and play sheets, and much more. I've disabled most of these to keep things simple.
+
+Here's a logic grid component for my post [Logic Grids as Data Structures](/blog/logic-grids-as-data-structures):
+
+<LogicPuzzle
+  client:only="react"
+  id="example-logic-grid"
+  cellSize={30}
+  categories={[
+    ['Names', ['Amy', 'Bintang', 'Chandra']],
+    ['Ages', ['7', '8', '9']],
+    ['Birthdays', ['April', 'January', 'September']],
+  ]}
+/>
+
+It's fully functional and inputs persist even over page reloads.
+
+I want each post to have at least one unique component. I think it adds a lot of interaction and individuality.
