@@ -1,0 +1,41 @@
+---
+import { calloutConfig, type CalloutVariant } from '@/lib/callout-config'
+import Callout from './Callout.astro'
+
+interface Props {
+  variants?: CalloutVariant[]
+  class?: string
+}
+
+const { variants, class: className } = Astro.props
+
+const entries = variants
+  ? variants.map((v) => [v, calloutConfig[v]] as const)
+  : (Object.entries(calloutConfig) as [
+      CalloutVariant,
+      (typeof calloutConfig)[CalloutVariant],
+    ][])
+---
+
+<div class:list={['[&_td]:align-middle', className]}>
+  <table>
+    <thead>
+      <tr>
+        <th>Variant</th>
+        <th>Usage</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        entries.map(([name, config]) => (
+          <tr>
+            <td>
+              <Callout variant={name} tag />
+            </td>
+            <td>{config.desc}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
