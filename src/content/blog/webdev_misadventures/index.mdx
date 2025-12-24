@@ -1,9 +1,94 @@
 ---
 title: 'Webdev Misadventures'
-description: 'Web development is a mess.'
-date: 2025-09-24
+description: "Web development is a mess. Here's how I made this website."
+date: 2025-12-22
 tags: ['programming']
 image: './webdev_misadventures.png'
 previewImage: './webdev_misadventures_preview.png'
 authors: ['Ryan Batubara']
 ---
+
+import Subpost from '@/components/Subpost.astro'
+
+# What I want from a website
+
+Web development is a mess. In my previous attempts at a portfolio and/or blogging site, I've always spent more time fighting the "features" of some template rather than writing actual content. Here are some examples of such "features:"
+
+- A comments section, e.g. [Giscus](https://giscus.app/) or [Disqus](https://disqus.com/). For most blogs, I think this is just a moderation liability.
+
+- Content management systems (CMS). Good file management and naming conventions are enough for me. I don't want to be forced into any CMS idiosyncracies either.
+
+- Share buttons. I have never used these.
+
+- Analytics like [Umami](https://umami.is/). This is just overkill.
+
+- Newsletter integrations. [RSS](https://en.wikipedia.org/wiki/RSS) is enough.
+
+- Too many prebuilt components, e.g. twenty different carousels. It's just [overchoice](https://en.wikipedia.org/wiki/Overchoice). If I need a component someday, I can make or look for one then.
+
+- Multi-author management systems. [Git](https://git-scm.com/) and [pull requests](https://github.blog/developer-skills/github/beginners-guide-to-github-creating-a-pull-request/) suffice.
+
+- Too many libraries. Why do you need [shadcn](https://ui.shadcn.com/), [MUI](https://mui.com/), [DaisyUI](https://daisyui.com/), _and_ [RadixUI](https://www.radix-ui.com/)?
+
+On the other hand, there are some features I consider essential to any website:
+
+- `constants` file(s). Both for styling, e.g. a single `.css` for all colors, and component data. More on this later.
+
+- [Open Graph](https://ogp.me/) metadata, and other basic [SEO](https://en.wikipedia.org/wiki/Search_engine_optimization) features. Its good for searchability.
+
+- [Affordable](https://en.wikipedia.org/wiki/Affordance) navigation stuff, e.g. a navbar, table of contents, etc.
+
+For blogs in particular, I consider these features essential:
+
+- Math equation support, e.g. via [KaTeX](https://katex.org/).
+
+- Code blocks with syntax highlighting, e.g. via [Shiki](https://shiki.matsu.io/).
+
+- Mobile support. That is, everything resizes without losing functionality.
+
+- A table of contents that's always accessible. These should not just be at the start and end, even on mobile.
+
+- Separation of content and style. I should not be styling components in the same file as my post text data.
+  - On that note, [`.mdx`](https://mdxjs.com/) or similar for content. Not [`.md`](https://en.wikipedia.org/wiki/Markdown). I should have easy access to JavaScript even in my content files, for components and the like.
+
+# What this website has
+
+This site is built off [Erudite](https://github.com/jktrn/astro-erudite). It satisfies every requirement above, with only minor modifications. Its [design document](https://astro-erudite.vercel.app/blog/the-state-of-static-blogs) significantly overlaps this one. I strongly recommend this template.
+
+Let me show off this site's features using my favorite feature: subposts.
+
+1. <Subpost
+     post="The Technicals"
+     href="/blog/webdev_misadventures/the-technicals/"
+     nav=""
+     desc="Why Astro? Why mdx? The tech stack."
+     icon="lucide:layers"
+   />
+
+2. <Subpost
+     post="Styling and Typography"
+     href="/blog/webdev_misadventures/styling-and-typography/"
+     nav=""
+     desc="Colors, fonts, and more. The fancy stuff."
+     icon="lucide:brush"
+   />
+
+3. <Subpost
+     post="Components"
+     href="/blog/webdev_misadventures/components/"
+     nav=""
+     desc="Callouts, widgets, and others. Reusable ploppables."
+     icon="lucide:cuboid"
+   />
+
+# The future of this site
+
+This site is first and foremost a blog, not a documentation nor commercial site. It also happens to showcase my projects and other work. Because of this, I'm already very happy with where the site is right now and am unlikely to add any major features moving forward.
+
+That said, I've always wanted to make my own version of various simple webapps. For example, [large-type.com](https://large-type.com) just displays large Unicode text on a screen. It's incredibly simple yet useful. I use it to silently communicate with people beside me (e.g. in a class). I can also do
+
+```sh
+$ make; open http://large-type.com/#Done!
+```
+
+I'd like to have simple utilities like that on this site someday.
