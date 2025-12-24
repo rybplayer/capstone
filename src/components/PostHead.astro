@@ -14,7 +14,7 @@ const parentPost = isSubpost(post.id) ? await getParentPost(post.id) : null
 const title = post.data.title || SITE.title
 const description =
   post.data.description || parentPost?.data.description || SITE.description
-const image = new URL('/static/1200x630.png', Astro.site)
+const image = new URL('/static/1200x630.webp', Astro.site)
 const author =
   post.data.authors && post.data.authors.length > 0
     ? post.data.authors.join(', ')

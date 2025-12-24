@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 import type { SocialLink } from '@/types'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
-import profilePicture from '../../public/static/profile_picture.png'
+import profilePicture from '../../public/static/profile_picture.webp'
 
 const blog = await getRecentPosts(SITE.featuredPostCount)
 const projects = await getRecentProjects(SITE.featuredProjectCount)
@@ -36,6 +36,7 @@ const projects = await getRecentProjects(SITE.featuredProjectCount)
             src={profilePicture}
             alt="Profile Picture"
             class="rounded-lg"
+            widths={[128, 256, 512, 1024]}
             loading="lazy"
             fetchpriority="high"
           />
@@ -54,6 +55,7 @@ const projects = await getRecentProjects(SITE.featuredProjectCount)
           src={profilePicture}
           alt="Profile Picture"
           class="rounded-lg object-cover"
+          widths={[256, 512]}
           loading="lazy"
           fetchpriority="high"
         />

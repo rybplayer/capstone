@@ -47,6 +47,7 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
             src={entry.data.image}
             alt={entry.data.title}
             width={1200}
+            widths={[128, 256, 512]}
             height={630}
             loading={isFirst ? 'eager' : 'lazy'}
             fetchpriority={isFirst ? 'high' : undefined}
