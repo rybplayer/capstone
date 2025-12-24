@@ -22,22 +22,18 @@ import { Icon } from 'astro-icon/components'
 </Button>
 
 <script is:inline data-astro-rerun>
-  const theme = (() => {
-    const localStorageTheme = localStorage?.getItem('theme') ?? ''
-    if (['dark', 'light'].includes(localStorageTheme)) {
-      return localStorageTheme
-    }
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark'
-    }
-    return 'light'
-  })()
+  ;(() => {
+    const theme = (() => {
+      const stored = localStorage?.getItem('theme') ?? ''
+      if (['dark', 'light'].includes(stored)) return stored
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+    })()
 
-  document.documentElement.setAttribute('data-theme', theme)
-  document.documentElement.classList.add(
-    theme === 'dark' ? 'scheme-dark' : 'scheme-light',
-  )
-  window.localStorage.setItem('theme', theme)
+    document.documentElement.setAttribute('data-theme', theme)
+    window.localStorage.setItem('theme', theme)
+  })()
 </script>
 
 <script>
