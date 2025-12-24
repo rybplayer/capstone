@@ -102,31 +102,41 @@ const projects = await getRecentProjects(SITE.featuredProjectCount)
 
         <!-- Buttons -->
         <div class="flex flex-wrap gap-2">
-          <Badge
-            variant="link"
-            link="https://github.com/rybplayer/Resume/blob/main/RyanBatubaraResume.pdf"
-          >
-            {'Resume'}
-          </Badge>
-          {
-            SOCIAL_LINKS.map(({ href, label }: SocialLink) => (
-              <Link
-                href={href}
-                aria-label={label}
-                title={label}
-                class={buttonVariants({ variant: 'outline', size: 'icon' })}
-                external
-              >
-                <Icon
-                  name={
-                    ICON_MAP[label as keyof typeof ICON_MAP] ||
-                    'lucide:message-circle-question'
-                  }
-                  class="hover:bg-secondary size-5"
-                />
-              </Link>
-            ))
-          }
+          <div class="flex flex-wrap gap-2">
+            <Badge
+              variant="link"
+              link="https://github.com/rybplayer/CV/blob/2fe395833ebbd594804631cdd80e7852d25e82ae/RyanBatubaraCV.pdf"
+            >
+              {'CV'}
+            </Badge>
+            <Badge
+              variant="link"
+              link="https://github.com/rybplayer/Resume/blob/main/RyanBatubaraResume.pdf"
+            >
+              {'Resume'}
+            </Badge>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {
+              SOCIAL_LINKS.map(({ href, label }: SocialLink) => (
+                <Link
+                  href={href}
+                  aria-label={label}
+                  title={label}
+                  class={buttonVariants({ variant: 'outline', size: 'icon' })}
+                  external
+                >
+                  <Icon
+                    name={
+                      ICON_MAP[label as keyof typeof ICON_MAP] ||
+                      'lucide:message-circle-question'
+                    }
+                    class="hover:bg-secondary size-5"
+                  />
+                </Link>
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>
