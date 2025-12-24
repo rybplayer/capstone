@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import type { TOCSection } from '@/lib/data-utils'
 import { getParentId, isSubpost } from '@/lib/data-utils'
 import { cn, getHeadingMargin } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
 
 type Props = {
   sections: TOCSection[]
@@ -93,13 +94,20 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
                               ? '#'
                               : `/blog/${section.subpostId}`
                           }
-                          class="marker:text-foreground/30 list-none underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
+                          class="marker:text-foreground/30 inline-flex list-none items-center gap-1 underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
                           data-heading-link={
                             section.subpostId === currentPostId
                               ? 'top'
                               : `${section.subpostId}-top`
                           }
                         >
+                          {section.icon && (
+                            <Icon
+                              name={section.icon}
+                              class="size-3 flex-shrink-0"
+                              aria-hidden="true"
+                            />
+                          )}
                           {section.title}
                         </a>
                       </li>

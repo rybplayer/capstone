@@ -252,6 +252,7 @@ export type TOCSection = {
   title: string
   headings: TOCHeading[]
   subpostId?: string
+  icon?: string
 }
 
 export async function getTOCSections(postId: string): Promise<TOCSection[]> {
@@ -292,6 +293,7 @@ export async function getTOCSections(postId: string): Promise<TOCSection[]> {
           isSubpostTitle: index === 0,
         })),
         subpostId: subpost.id,
+        icon: subpost.data.icon,
       })
     }
   }

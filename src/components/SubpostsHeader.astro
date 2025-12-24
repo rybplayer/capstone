@@ -52,10 +52,10 @@ const currentSubpostDetails = isCurrentSubpost
               <Icon
                 name={
                   currentSubpostDetails
-                    ? 'lucide:file-text'
+                    ? currentSubpostDetails.data.icon || 'lucide:file-text'
                     : isActivePost
-                      ? 'lucide:book-open-text'
-                      : 'lucide:book-open'
+                      ? activePost?.data.icon || 'lucide:book-open-text'
+                      : activePost?.data.icon || 'lucide:book-open'
                 }
                 class="size-4 flex-shrink-0"
                 aria-hidden="true"
@@ -89,7 +89,7 @@ const currentSubpostDetails = isCurrentSubpost
                   {isActivePost ? (
                     <div class="text-foreground bg-muted mobile-subposts-active-item flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium">
                       <Icon
-                        name="lucide:book-open-text"
+                        name={activePost.data.icon || 'lucide:book-open-text'}
                         class="size-4 flex-shrink-0"
                         aria-hidden="true"
                       />
@@ -118,7 +118,7 @@ const currentSubpostDetails = isCurrentSubpost
                       class="mobile-subposts-link hover:text-foreground text-muted-foreground hover:bg-muted/50 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors"
                     >
                       <Icon
-                        name="lucide:book-open"
+                        name={activePost.data.icon || 'lucide:book-open'}
                         class="size-4 flex-shrink-0"
                         aria-hidden="true"
                       />
@@ -151,7 +151,7 @@ const currentSubpostDetails = isCurrentSubpost
                     currentPostId === subpost.id ? (
                       <div class="text-foreground bg-muted mobile-subposts-active-item flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium">
                         <Icon
-                          name="lucide:file-text"
+                          name={subpost.data.icon || 'lucide:file-text'}
                           class="size-4 flex-shrink-0"
                           aria-hidden="true"
                         />
@@ -168,7 +168,7 @@ const currentSubpostDetails = isCurrentSubpost
                         class="mobile-subposts-link hover:text-foreground text-muted-foreground hover:bg-muted/50 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors"
                       >
                         <Icon
-                          name="lucide:file"
+                          name={subpost.data.icon || 'lucide:file'}
                           class="size-4 flex-shrink-0"
                           aria-hidden="true"
                         />

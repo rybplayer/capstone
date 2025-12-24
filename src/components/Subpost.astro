@@ -1,15 +1,18 @@
 ---
+import { getPostById } from '@/lib/data-utils'
 import { Icon } from 'astro-icon/components'
 
 export interface Props {
-  post: string
-  href: string
-  nav: string
-  icon?: string
-  desc?: string
+  id: string
+  nav?: string
 }
 
-const { post, href, nav, icon = 'lucide:file-text', desc = '' } = Astro.props
+const { id, nav = '' } = Astro.props
+const post = await getPostById(id)
+const title = post?.data.title ?? id
+const desc = post?.data.description ?? ''
+const icon = post?.data.icon ?? 'lucide:file-text'
+const href = `/blog/${id}`
 ---
 
 <div class="not-prose group mt-6 flex justify-center">
@@ -22,7 +25,7 @@ const { post, href, nav, icon = 'lucide:file-text', desc = '' } = Astro.props
       <div class="flex flex-col">
         {nav && <div class="text-muted-foreground text-xs">{nav}</div>}
         <div class="font-medium">
-          {post}
+          {title}
           {
             desc && (
               <span class="text-muted-foreground block text-xs md:ml-2 md:inline">
