@@ -197,11 +197,10 @@ export async function getParentPost(
 export function parseAuthors(authorIds: string[] = []) {
   if (!authorIds.length) return []
 
-  // Simplified: just return author names as strings
   return authorIds.map((name) => ({
     id: name,
     name: name,
-    isRegistered: false, // No longer using author collection
+    isRegistered: false,
   }))
 }
 
