@@ -1,3 +1,5 @@
 ---
-return Astro.redirect('/report/index')
+import { withBase } from '@/lib/utils'
+
+return Astro.redirect(withBase('/report/index'))
 ---

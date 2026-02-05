@@ -37,3 +37,12 @@ export function getHeadingMargin(depth: number): string {
   }
   return margins[depth] || ''
 }
+
+export function withBase(path: string): string {
+  const rawBaseUrl = import.meta.env.BASE_URL
+  const baseUrl = rawBaseUrl.endsWith('/') ? rawBaseUrl : `${rawBaseUrl}/`
+  if (path.startsWith('/')) {
+    return `${baseUrl}${path.slice(1)}`
+  }
+  return path
+}

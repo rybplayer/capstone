@@ -1,44 +1,9 @@
 ---
-title: 'On communication lower bounds for multi-party graph traversal'
-description: 'Our report'
+title: 'Lower bounds'
+description: 'Equality and disjointness reductions'
 date: 2026-02-04
-image: ''
+order: 2
 ---
-
-# Problem
-
-Consider a graph $$G$$ with edges $$E$$ and vertices $$V$$, and subgraphs
-$$G_1, \ldots, G_k \subset G$$. Let $$G_i = (E_i, V_i)$$ for these
-subgraphs. For now let us suppose the graph is unweighted and
-undirected. The subgraphs need not cover $$G$$ and can overlap. Each
-player $$i$$ knows $$G$$ and $$G_i$$, but not the other player's graphs. (This
-is akin to a map of a city, where each player is a different regional
-taxi company.) The goal is, given some starting vertex $$v \in V$$, and
-some end vertex $$w \in V$$, to:
-
-1.  Identify if it is possible to construct a path
-    $$v, v_1, \dots, v_l, w$$ such that every edge on the path is in
-    $$\bigcup_{i=0}^{k} E_i$$.
-
-2.  If such a path exists, find the minimum number of edges needed to
-    get from $$v$$ to $$w$$, while using only edges belonging to
-    $$\bigcup_{i=0}^{k} E_i$$.
-
-# Lower bound sketches and ideas
-
-For (1), this would require computing $$\binom{k}{2}$$ pairwise set
-disjointness in the worst case, to determine where the intersections of
-each $$G_i$$ are, at which point each player could on their own determine
-the possible paths between each of the subgraphs that intersect with
-their own.
-
-For (2), we would be required to compute $$\binom{k}{2}$$ pairwise
-intersections, since in order to minimize the path we would need to know
-all possible paths that could connect $$v$$ and $$w$$. To find the shortest
-path, each player works backwards and sends the distances through their
-internal vertices to the players they intersect with, and each player
-will attempt to identify if a longer path can be dropped whenever they
-receive this list.
 
 # Lower bound using Equality
 

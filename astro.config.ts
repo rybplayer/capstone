@@ -20,6 +20,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   site: 'https://rybplayer.github.io',
+  base: '/capstone',
   integrations: [
     expressiveCode({
       themes: ['github-light', 'github-dark'],
