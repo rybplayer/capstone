@@ -1,0 +1,18 @@
+---
+import katex from 'katex'
+
+export interface Props {
+  value: string
+  display?: boolean
+  class?: string
+}
+
+const { value, display = false, class: className = '' } = Astro.props
+const html = katex.renderToString(value, {
+  throwOnError: false,
+  displayMode: display,
+})
+const Tag = display ? 'div' : 'span'
+---
+
+<Tag class={className} set:html={html} />

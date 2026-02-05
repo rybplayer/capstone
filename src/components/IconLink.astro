@@ -1,0 +1,54 @@
+---
+import { Icon } from 'astro-icon/components'
+
+export interface Props {
+  href: string
+  icon: string
+  text: string
+  subtext?: string
+  maxWidth?: string
+  class?: string
+  target?: string
+  rel?: string
+}
+
+const {
+  href,
+  icon,
+  text,
+  subtext = '',
+  maxWidth = 'max-w-60',
+  class: className = '',
+  target,
+  rel,
+} = Astro.props
+
+const computedRel = rel ?? (target === '_blank' ? 'noreferrer' : undefined)
+---
+
+<a
+  href={href}
+  target={target}
+  rel={computedRel}
+  class:list={[
+    'hover:bg-muted inline-flex w-full flex-1 items-center justify-between rounded-lg border p-3 no-underline transition-colors duration-200',
+    maxWidth,
+    className,
+  ]}
+>
+  <div class="flex min-w-0 items-center gap-2">
+    <Icon name={icon} class="size-4 flex-shrink-0" />
+    <div class="flex min-w-0 flex-col">
+      <div class="font-medium break-words">
+        {text}
+        {
+          subtext && (
+            <span class="text-muted-foreground block text-xs md:ml-2 md:inline">
+              {subtext}
+            </span>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</a>
