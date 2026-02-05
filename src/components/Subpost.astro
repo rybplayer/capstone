@@ -1,6 +1,7 @@
 ---
 import { getPostById } from '@/lib/data-utils'
 import { Icon } from 'astro-icon/components'
+import { withBase } from '@/lib/utils'
 
 export interface Props {
   id: string
@@ -12,7 +13,7 @@ const post = await getPostById(id)
 const title = post?.data.title ?? id
 const desc = post?.data.description ?? ''
 const icon = post?.data.icon ?? 'lucide:file-text'
-const href = `/report/${id}`
+const href = withBase(`/report/${id}`)
 ---
 
 <div class="not-prose group mt-6 flex justify-center">

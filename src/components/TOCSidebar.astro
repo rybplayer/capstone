@@ -2,7 +2,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { TOCSection } from '@/lib/data-utils'
 import { getParentId, isSubpost } from '@/lib/data-utils'
-import { cn, getHeadingMargin } from '@/lib/utils'
+import { cn, getHeadingMargin, withBase } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 
 type Props = {
@@ -30,9 +30,10 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
         <div class="flex flex-col gap-2 px-4">
           <span class="text-lg font-medium">Table of Contents</span>
           {sections.map((section, index) => {
+            const previousSection = sections[index - 1]
             const isFirstSubpost =
               section.type === 'subpost' &&
-              (index === 0 || sections[index - 1].type === 'parent')
+              (index === 0 || previousSection?.type === 'parent')
 
             return (
               <>
@@ -61,7 +62,7 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
                         <a
                           href={
                             isCurrentSubpost
-                              ? `/report/${parentId}#${heading.slug}`
+                              ? withBase(`/report/${parentId}#${heading.slug}`)
                               : `#${heading.slug}`
                           }
                           class="marker:text-foreground/30 list-none underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
@@ -92,7 +93,7 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
                           href={
                             section.subpostId === currentPostId
                               ? '#'
-                              : `/report/${section.subpostId}`
+                              : withBase(`/report/${section.subpostId}`)
                           }
                           class="marker:text-foreground/30 inline-flex list-none items-center gap-1 underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
                           data-heading-link={
@@ -125,7 +126,9 @@ const parentId = isCurrentSubpost ? getParentId(currentPostId) : currentPostId
                             href={
                               section.subpostId === currentPostId
                                 ? `#${heading.slug}`
-                                : `/report/${section.subpostId}#${heading.slug}`
+                                : withBase(
+                                    `/report/${section.subpostId}#${heading.slug}`,
+                                  )
                             }
                             class="marker:text-foreground/30 hover:text-foreground/60 list-none underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
                             data-heading-link={
