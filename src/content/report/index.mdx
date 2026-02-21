@@ -9,158 +9,342 @@ Repository: [https://github.com/rybplayer/DSCCapstone](https://github.com/rybpla
 
 # Introduction
 
-This report studies communication lower and upper bounds for multi-party
-graph traversal problems, motivated by real systems in which no single
-agent holds the full network state. We focus on settings where a global
-graph is known but each party privately owns a subset of vertices and
-edges, and the task is to determine reachability or shortest paths that
-must lie within the union of their private subgraphs.
+## A motivating problem
 
-## Motivation from multi-party traversal case studies
+Graphs are fundamental data structures for modelling relationships between entities. For example, an airline may choose to store their flights as a graph, whose vertices are destinations and directed edges are flights between destinations. Many well-known algorithms make this a feasible data structure for the airline. Now suppose a user wishes to plan flights, perhaps with transits, from point $A$ to $B$. This user may need to consider a large variety of airlines, each with their own graph. How can the user do this?
 
-Large-scale transportation and infrastructure disruptions create a
-natural model for multi-party graph traversal. Consider the 2010
-European volcanic ash shutdown: air-navigation service providers,
-airports, and airlines each control disjoint portions of airspace and
-schedules. Rerouting passengers is a shortest-path problem in a layered
-graph whose feasible vertices and edges change over time. No party can
-broadcast its full real-time state, both for operational and privacy
-reasons, so route feasibility must be computed with limited information
-exchange.
+Clearly, the user can get the full database of all flights, and compute the desired sequence of flights on their own. But this is obviously costly in many regards. We want to minimize the amount of processing and communication between these parties while still giving the user the desired result. Indeed, there exists a variety of algorithms for this in the literature.
 
-Similar graph-traversal constraints appear in urban transit shutdowns
-and phased restorations, where distinct agencies own stations and
-tunnels. After Hurricane Sandy, service availability evolved over weeks,
-and agencies coordinated alternate routes under partial knowledge of
-what infrastructure was open. Highway detours after the I-95 bridge
-collapse in Philadelphia illustrate the same phenomenon in a road
-network: different operators own highway segments and toll roads, and a
-single failed cut edge forces traffic onto alternative paths with
-asymmetric knowledge of capacities.
-
-The maritime and logistics examples are equally instructive. The 2021
-Suez Canal blockage forced carriers to reroute around the Cape of Good
-Hope or wait, a decision that depends on schedule and capacity
-information held privately by shipping lines and port operators. When
-the Baltimore Key Bridge collapsed, access to the port was blocked and
-cargo was diverted to alternate ports, again requiring coordination
-across a sea--port--land graph with private operational constraints.
-
-Communication bottlenecks become even sharper in critical infrastructure
-networks. During the 2021 Texas ERCOT blackout, grid operators and
-utilities effectively solve a constrained flow and connectivity problem
-as generation and transmission nodes go offline. The Colonial Pipeline
-cyber disruption similarly forced fuel logistics to reroute through
-alternate depots and terminals with incomplete visibility. Finally, the
-2021 Meta backbone withdrawal and the 2016 Dyn DNS attack show that
-digital services rely on reachability in routing and dependency graphs,
-where policy and security constraints limit information sharing across
-administrative domains.
-
-These cases motivate a theoretical study of multi-party graph traversal:
-agents must collaboratively decide reachability and shortest paths while
-their private subgraphs, capacities, or weights are not fully shareable.
-The fundamental question is how much communication is necessary, and how
-randomized protocols, sketches, or partial disclosures can reduce the
-burden while preserving correctness.
+In this report, we ask an adjacent question: What is the minimum amount of communication necessary for the user to complete this task, without considering the local storage and computational cost to each party? Yao’s communication complexity model formalizes this idea, allowing us to prove algorithmic lower bounds for situations like the above. These algorithmic lower bounds are concrete, mathematical claims that show we cannot asymptotically reduce communication beyond a certain point.
 
 ## Why communication is the bottleneck
 
-In the model we consider, each party has unlimited local computation but
-limited ability to share data. This is realistic: air traffic control
-centers, network operators, or utilities can compute detailed local
-routes, but cannot afford to broadcast all local states and constraints
-due to bandwidth, privacy, regulatory, or security limitations. The
-communication cost, not the local computation, is what constrains
-real-time coordination.
+In the model we consider, each party has unlimited local computation and we only wish to minimize the communication between them. In the airline routing example above, this restriction is quite realistic: airline servers and user computers can easily compute routes given the data. However, neither can afford to broadcast or receive all states due to bandwidth limitations, especially if there are multiple requests. The communication cost, not the local computation, is the bottleneck.
 
-Communication complexity makes this separation explicit. In particular,
-it shows that even when each party can compute arbitrarily powerful
-local summaries, some global questions still require a large number of
-bits to be exchanged. For example, deciding whether two privately held
-sets intersect already requires linear communication in the worst case.
-This lower bound appears again in many traversal problems via reductions
-that embed set disjointness or equality into graph reachability. Thus,
-communication is not simply a practical nuisance: it is an inherent
-barrier that must be designed around.
+Communication complexity makes this separation explicit. In particular, it shows that even when each party can compute arbitrarily powerful local summaries, some global questions still require a large number of bits to be exchanged. For example, a route may require flights from multiple airlines. Thus communication is not just a practical nuisance, but an inherent barrier that be designed around.
 
-## Why bounds matter for hardware, networks, and algorithms
+## Why communication bounds matter
 
-Lower and upper bounds provide practical guidance in three ways. First,
-they inform hardware design. If a reachability or shortest-path query
-provably requires $\Omega(n)$ bits of communication, then any system
-intended to answer such queries at scale must provision sufficient
-bandwidth or memory to move that information. Second, bounds guide
-network architecture: if communication is unavoidable, the topology of
-communication links, the placement of caches, and the choice of
-aggregation points become part of the algorithmic design. Third, bounds
-shape algorithm development: a tight lower bound rules out overly
-ambitious protocols and motivates either approximate solutions,
-randomized protocols with small error, or problem relaxations that admit
-sublinear communication. Conversely, upper bounds show which tasks are
-feasible under realistic constraints, making them valuable to
-practitioners who must trade correctness, latency, and privacy.
+These lower bounds have a variety of applications for algorithm, system and software design. An algorithm’s complexity could be described as an upper bound on the amount of communication between parties. If communication complexity provides a corresponding lower bound, this means this algorithm is tight and its communication cannot asymptotically be improved. For system designers, there is often a lot of choice in how communication is routed through a network. For example, a central server could manage all communications, or a distributed network may be used. Communication complexity can provide lower bounds for each of these scenarios, for instance by proving that distributed networks are asymptotically no better than a centralized communication server. Communication complexity can also inform software decisions, by providing insight into how to manage the bits of communication between parties.
 
 ## Communication complexity basics
 
-We briefly formalize the model. Let
-$f:\mathcal{X}\times\mathcal{Y}\to\{0,1\}$ be a function. In the
-two-party model, Alice receives $x\in\mathcal{X}$ and Bob receives
-$y\in\mathcal{Y}$. A deterministic protocol is a binary decision tree
-whose nodes are labeled by which party speaks and whose edges are
-labeled by bits; the transcript is the sequence of bits exchanged. The
-protocol must output $f(x,y)$ at a leaf. The deterministic communication
-complexity $D(f)$ is the minimum, over all correct protocols, of the
-maximum transcript length over all inputs.
+We briefly define the various measures of communication complexity used in this report. Interested readers should see \cite{RaoYehudayoffBook} or \cite{RoughgardenBook} for a more thorough introduction. Let $f: X \times Y \to \{0,1\}$ be a function. In the two-party model, Alice receives $x \in X$ and Bob receives $y \in Y$, and they wish to compute $f(x,y)$. A *deterministic protocol* is a binary decision tree whose nodes are labeled by which party speaks and whose edges are labeled by bits $0$ or $1$. The *transcript* $\pi(x,y)$ is the sequence of bits exchanged for a particular input $x$ and $y$. The protocol must output $f(x,y)$ at a leaf. The *deterministic* communication complexity $D(f)$ is the minimum, over all correct protocols, of the maximum transcript length (or equivalently, protocol tree depth) over all inputs.
 
-Randomized protocols allow parties to use random coins to reduce
-communication. A public-coin protocol assumes a shared random string,
-while a private-coin protocol lets each party sample independently.
-Fixing the randomness yields a deterministic protocol, so a randomized
-protocol is a distribution over deterministic protocols. The randomized
-communication complexity $R_\varepsilon(f)$ is the minimum number of
-communicated bits needed to compute $f$ with error at most $\varepsilon$
-on every input. Public-coin and private-coin models are equivalent up to
-small overhead, and randomness often trades a small probability of error
-for large savings in communication.
+A *nondeterministic protocol* for $f$ has two parts: First, an external party has access to $x$ and $y$, and provides advice $a$ to both players. Then, the players, with access to $a$ and their respective input, communicate to decide whether to output $0$ or $1$. Let $\Pi(x,y,a)$ denote the output of the protocol, which we say is correct if
 
-Two classical benchmark problems are equality and disjointness. Equality
-asks whether $x=y$ for $x,y\in\{0,1\}^n$, and disjointness asks whether
-$X\cap Y=\emptyset$ for subsets of $[n]$. Both are complete for a wide
-range of lower-bound techniques. Deterministically, equality requires
-$n$ bits in the worst case, and disjointness requires $\Omega(n)$
-communication. Randomization yields large gains for equality via
-hashing, but not for disjointness, which remains hard.
+-   If $f(x,y) = 1$, then $\exists a$ with $\Pi(x,y,a) = 1$.
 
-## From communication to graph traversal
+-   If $f(x,y) = 0$, then $\forall a$, $\Pi(x,y,a) = 0$.
 
-Graph traversal problems can be embedded with these benchmarks. A simple
-variant illustrates the connection. Let a known undirected graph
-$G=(V,E)$ be given. Alice receives a start vertex $v$ and a subset
-$X\subseteq V$, Bob receives an end vertex $w$ and a subset
-$Y\subseteq V$. The task is to output $1$ if there exists a path from
-$v$ to $w$ using only vertices in $X\cup Y$ and edges that are wholly
-contained within $X$ or wholly contained within $Y$. By constructing a
-graph in which each bit of an input string controls which local vertices
-are present, one can reduce equality to this traversal problem. This
-implies that even this restricted reachability task has deterministic
-communication complexity $\Omega(n)$ when $|V|=\Theta(n)$.
+The cost of $\Pi$ is the sum of $a$ and any communication between players. The *nondeterministic* cost of $f$, denoted $N^1(f)$, is the minimal cost of a protocol computing $f$. The *co-nondeterministic* cost of $f$ is the nondeterministic cost for $1-f$.
 
-The case studies above map naturally to this model. Each actor controls
-a subgraph of the global infrastructure; edges represent feasible
-transitions, and reachability encodes whether a route exists that
-respects ownership and availability constraints. The reduction
-perspective explains why coordination can be intrinsically expensive:
-some instances encode hard communication problems, so no protocol can be
-both exact and frugal with communication in the worst case.
+Randomized protocols allow parties to use random coins to reduce communication. A public-coin protocol assumes a shared random string, while a private-coin protocol lets each party sample independently. Fixing the randomness yields a deterministic protocol, so a randomized protocol is a distribution over deterministic protocols. The *randomized* communication complexity $R_\varepsilon(f)$ is the minimum communicated bits needed to compute $f$ with error at most $\varepsilon$ on every input. Public-coin ($R^{pub}_\varepsilon(f)$) and private-coin ($R_\varepsilon(f)$) models are equivalent up to small overhead, and randomness often trades a small probability of error for large savings in communication. Let $R(f) = R_{c}(f)$ with $c = 1/3 < 1/2$.
 
-## Scope of this report
+## Communication complexity basic examples
 
-The remainder of this report develops a communication-complexity view of
-multi-party graph traversal. We formalize traversal models, establish
-lower bounds via reductions, and explore upper bounds that exploit
-randomness, sketches, or structure. Throughout, the guiding message is
-that communication is not merely an implementation detail. It is a
-fundamental resource with provable limits, and understanding those
-limits yields actionable insights for designing distributed routing,
-resilient infrastructure, and scalable coordination protocols.
+Two classic communication complexity problems are equality and disjointness. Equality asks whether $x=y$ for $x,y\in\{0,1\}^n$, and disjointness asks whether $X\cap Y=\emptyset$ for subsets of $[n]$. Both are useful for a range of lower-bound techniques, so we go through their communication complexity bounds below:
+
+**Claim 1**. *Equality, denoted $EQ: X \times Y \to \{0,1\}$, outputs $1$ if $x \in X$ and $y \in Y$ have $x=y$, and $0$ otherwise. $EQ$ has $D(EQ) = n$, $N^1(EQ) = n$, $N^0(EQ) = \Theta(\log n)$, and $R^{pub}_\varepsilon(EQ) = O(\log(1/\varepsilon))$.*
+
+
+
+
+*Proof.* First $D(EQ) = n$.
+
+-   Upper bound: Alice sends all $n$ bits of $x$ to Bob, who compared it to $y$ and outputs.
+
+-   Lower bound: Any deterministic protocol partitions the $\{0,1\}^n \times \{0,1\}^n$ matrix $M_EQ$ into combinatorial $z$-rectangles, i.e. regions $R = A \times B \subseteq X \times Y$ where $f(a,b) = z$ for all $a \in A$, $b \in B$, and $z \in \{0,1\}$. Clearly $M_EQ = I_{\{0,1\}^n \times \{0,1\}^n}$. Hence there are $2^n$ 1-rectangles or at least $2^n$ leaves in the protocol tree. Thus $D(f) \geq \log_2(2^n) = n$.
+
+Now $N^1(EQ) = n$. This means we want to certify $x = y$.
+
+-   Upper bound: The prover sends $x$ to both players. Both players check if it matches their input. If so, accept.
+
+-   Lower bound: Similar to $D(EQ)$, we need $2^n$ distinct certificates to cover all possible inputs. Hence certificate length $\geq \log_2(2^n) = n$.
+
+Now $N^0(EQ) = \log(n)$. This means we want to certify $x \neq y$.
+
+-   The prover computes an index $i \in [n]$ where $x_i \neq y_i$. This takes $\log(n)$ bits to communicate to Alice and Bob, who can exchange bits at that coordinate and witness if they differ.
+
+-   There are $n$ possible indices $i$. If certificates had length $< \log(n)$, there would be $< n$ certificates which cannot cover all the possibilities.
+
+Now $R_\varepsilon^{pub}(EQ) = O(\log(1/\varepsilon))$.
+
+-   Upper bound: Using shared randomness, pick $k$ strings $r^{(1)}, \ldots, r^{(k)} \in \{0,1\}^n$. For each $j \in [k]$, Alice sends $b_j = \langle x, r^{(j)} \rangle \text{mod } 2$. Bob computes $\langle y, r^{(j)}\rangle \text{mod }2$ and checks equality for all $j \in [k]$. If $x = y$, this always succeeds. If $x \neq y$, each check fails independently with probability $1/2$, since the $r^{(j)}$ are uniformly random. Take $k = \lceil \log_2(1 / \epsilon) \rceil$.
+
+We do not prove it, but $R_\varepsilon^{pub}(EQ) = O(\log(n))$ with only private randomness. ◻
+
+
+**Claim 2**. *Set disjointness, denoted $DISJ$, interprets $x,y \in \{0,1\}^n$ as subsets $X,Y \subseteq [n]$ with $$\begin{aligned}
+    DISJ(x,y) = 1 \iff \forall i \in [n], x_i y_i = 0.\end{aligned}$$ Then $D(DISJ) = \Theta(n)$, $N^1(DISJ) = \Theta(n)$, $N^0(DISJ) = \Theta(\log n)$, $R(DISJ) = \Theta(n)$. Furthermore, if $|X| = |Y| = k \ll n$, then $D(DISJ) = \Theta(k)$.*
+
+
+These bounds are well known in the literature, so we choose to omit the proof for $DISJ$ bounds. Both $EQ$ and $DISJ$ are very useful for *reductions*, where we embed a problem with known bounds in another, to show this other problem cannot be solved too efficiently. In particular, $EQ$ is “maximally complicated” for deterministic protocols and $DISJ$ is “maximally complicated” for randomized protocols, in the sense that $D(EQ) = n$ and $R(DISJ) = \Theta(n)$.
+
+## Literature Review
+
+In this section, we briefly review some results related to our graph traversal problems.
+
+This section is under construction, as we are still considering new variants of our problem. Therefore, we are not yet sure what results in the literature will be relevant to discuss here.
+
+# The Two-Party Traversal Problem
+
+## Motivating our problem
+
+In this and the following sections, we will define and show communication bounds for a series of problems pertaining to multi-party graph traversal. Please see Appendix <a href="#appendix:case-studies" data-reference-type="ref" data-reference="appendix:case-studies">7</a> for a variety of case studies that motivates the following problem definitions.
+
+## Problem Statement
+
+We begin with the simplest non-trivial formulation of our problem, inspired by <a href="#ex:motivating-problem" data-reference-type="ref" data-reference="ex:motivating-problem">1.1</a>.
+
+Consider a graph $G = (V,E)$ and subgraphs $G_1, \ldots, G_k \subset G$. Let $G_i = (V_i, E_i)$ for these subgraphs. For now let us suppose $G$ is unweighted and undirected. The subgraphs need not cover $G$ and can overlap. Each player $i$ knows $G$ and $G_i$, but not the other player’s graphs. The goal is, given some starting vertex $v \in V$, and some end vertex $w \in V$ to:
+
+1.  Identify if it is possible to construct a path $v, v_1, \dots, v_l, w$ such that every edge on the path is in $\bigcup_{i=0}^{k} E_i$. <span id="prob:traversal-exists-path" label="prob:traversal-exists-path"></span>
+
+2.  If such a path exists, find the minimum number of edges needed to get from $v$ to $w$, while using only edges belonging to $\bigcup_{i=0}^{k} E_i$. <span id="prob:traversal-min-path" label="prob:traversal-min-path"></span>
+
+If some $e = (u,v) \in G_i$, we must have $u,v \in V(G_i)$. But the converse is not always true.
+
+Sometimes, condition <a href="#prob:traversal-exists-path" data-reference-type="ref" data-reference="prob:traversal-exists-path">[prob:traversal-exists-path]</a> fails, as in Figure <a href="#fig:traversal-no-path" data-reference-type="ref" data-reference="fig:traversal-no-path">[fig:traversal-no-path]</a>. In such a case, it is sufficient for one party to be convinced that no path exists.
+
+## Two-party lower bounds
+
+We begin by considering the case with only two players and thus two subgraphs. Let these players be named Alice and Bob, with subgraphs $G_A$ and $G_B$ respectively. Denote this problem by $trav_2$, i.e. the traversal problem for 2 players, where $|V(G)| = n$ and $|E(G)| = O(n^2)$.
+
+
+**Claim 3**. *Recall that equality $EQ$ has inputs $x,y \in \{0,1\}^n$, and $EQ(x,y) = 1$ iff $x = y$. Then $D(TRAV_2) \geq D(EQ)$ and so on.*
+
+
+*Proof.* **Equality gadget.** We construct a gadget that enforces equality at a single bit position. The gadget is shown in Figure <a href="#fig:equality_gadget" data-reference-type="ref" data-reference="fig:equality_gadget">[fig:equality_gadget]</a>. The gadget consists of two parallel branches.
+
+1.  The top branch corresponds to the assignment $x_i = y_i = 1$,
+
+2.  The bottom branch corresponds to the assignment $x_i = y_i = 0$.
+
+<span id="fig:equality_gadget" label="fig:equality_gadget"></span>
+
+The idea is that Alice enables exactly one entry node of the gadget depending on $x_i$, and Bob enables exactly one exit node depending on $y_i$. A path exists through the gadget if and only if Alice and Bob select nodes on the same branch, which holds exactly when $x_i = y_i$.
+
+**Reduction to our graph problem.** Construct a graph of $n$ equality gadgets in a chain, as in Figure <a href="#fig:equality-gadget-chain" data-reference-type="ref" data-reference="fig:equality-gadget-chain">[fig:equality-gadget-chain]</a>. Construct subgraph $G_A$ as follows: Include all vertices at the start and end of each equality gadget. Also, for every $i \in [n]$, give the vertex labelled $x_i = 1$ if this is true, else $x_i = 0$. Then, add all edges between these vertices, as well as all edges between $x_i = z$ and $y_i = z$ for $z \in \{0,1\}$. Do similar for $G_B$.
+
+In the resulting graph, there exists a path from $v$ to $w$ if and only if all gadgets are traversable, which occurs if and only if $x_i = y_i$ for all $i$, i.e., if and only if $x = y$.
+
+We conclude by noting that the resulting graph $G$ has $\Theta(n)$ vertices and $\Theta(n)$ edges. ◻
+
+
+
+**Claim 4**. *Recall that in two-party $DISJ$, Alice and Bob are given sets $X, Y \subseteq [n]$ each. The goal is to determine whether $X \cap Y = \emptyset$. We claim $D(TRAV_2) \geq D(DISJ)$ and so on.*
+
+
+
+
+*Proof.* **Disjointness gadget.** We construct a gadget that enforces disjointness at a single entry $i \in [n]$. The gadget is shown in Figure <a href="#fig:disjoint_gadget" data-reference-type="ref" data-reference="fig:disjoint_gadget">[fig:disjoint_gadget]</a>. There, let $x_i$ and $y_1$ be indicator functions whether $i \in X$ and $i \in Y$ respectively. Then:
+
+1.  The top branch corresponds to when $x_i$ has the element but $y_i$ does not
+
+2.  The middle branch corresponds to when $x_i$ and $y_i$ do not have the element
+
+3.  The top branch corresponds to when $y_i$ has the element but $x_i$ does not
+
+In other words, there is no path left to right if $i \in X \cap Y$.
+
+**Reduction to our graph problem.** We construct a graph $G$ by chaining one copy of this gadget for each index $i \in [n]$ between a global start vertex $v$ (left) and end vertex $w$ (right). Construct $G_A$ by giving all vertices at the start and end of every disjointness gadget, and vertices labelled $x_i = 1$ if it is true, else $x_i = 0$. Add all edges between these vertices, and all edges between $x_i = z$ and $y_i = z'$ for $z, z' \in \{0,1\}$. Do similar for $G_B$.
+
+In the resulting graph, there exists a path from $v$ to $w$ if and only if all disjointness gadgets are traversable, which occurs if and only if $X \cap Y = \emptyset$.
+
+We conclude by noting that $|V(G)| = \Theta(n)$ and $|E(G)| = \Theta(n)$. ◻
+
+
+
+## Specialized two-party lower bounds
+
+The previous proofs show that $TRAV_2$ is maximally complicated in terms of deterministic communication complexity, and almost maximally complicated in terms of randomized communication complexity. A natural follow up question is to ask if we can do better. That is, given some additional constraints, can we solve the problem with less communication asymptotically?
+
+
+**Definition 1**. *Define the $CTRAV_2$ problem as a $TRAV_2$ problem where $G_A$ and $G_B$ are guaranteed to be complete and connected.*
+
+
+
+
+**Claim 5**. *$D(CTRAV_2) \geq D(DISJ)$ and so on.*
+
+
+
+*Proof.* If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
+
+Since $G_A$ and $G_B$ are complete, then a valid path occurs if and only if $V(G_A) \cap V(G_B) \neq \emptyset$. Then, by a similar argument to Claim <a href="#claim:disjoint-trav-bound" data-reference-type="ref" data-reference="claim:disjoint-trav-bound">4</a>, this problem is at least as hard as $DISJ$. Thus $D(CTRAV_2) \geq D(DISJ)$ and so on. ◻
+
+
+
+This tells us that the local structure of $G_A$ and $G_B$ alone is not a significant source of communication difficulty. That is, even when $G_A$ and $G_B$ are complete graphs, we do not get obviously better lower bounds.
+
+**Definition 2**. *Define $STRAV_2$ as a $TRAV_2$ problem where $E(G) = O(n)$, $E(G_A) = O(n)$, and $E(G_B) = O(n)$. In other words, the graph $G$ is sparse and $G_A$, $G_B$ are sparse too.*
+
+
+
+**Claim 6**. *$D(STRAV_2) \geq D(DISJ)$ and so on.*
+
+
+*Proof.* Consider the case where $G_A$ and $G_B$ are connected. If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
+
+Then a valid path occurs if and only if $V(G_A) \cap V(G_B) \neq \emptyset$. Then, by a similar argument to Claim <a href="#claim:disjoint-trav-bound" data-reference-type="ref" data-reference="claim:disjoint-trav-bound">4</a>, this problem is at least as hard as $DISJ$. Thus $D(STRAV_2) \geq D(DISJ)$ and so on. ◻
+
+
+
+This tells us that weak edge sparsity of $G$, $G_A$, and $G_B$ does not add nor remove significant communication cost.
+
+# The Iterated Two-Party Traversal Problem
+
+In section <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a>, we considered $TRAV_2$, the communication game where both Alice and Bob computed the minimum length path from $v$ to $w$ under some conditions. However, many problems that are modelled by $TRAV_2$ tend to occur *iteratively*.
+
+For example, consider the motivating problem <a href="#ex:motivating-problem" data-reference-type="ref" data-reference="ex:motivating-problem">1.1</a>. A user may want to send multiple queries in succession, while having partial information of the state of the system based on their previous queries. We try to generalize this notion here.
+
+
+**Definition 3**. *Let $ITRAV_2$ be the following communication game: A graph $G = (V,E)$ is known, and two players Alice and Bob receive initial subgraphs $G_A^0$ and $G_B^0$ of $G$. Call this iteration $t = 0$. Alice and Bob then play $TRAV_2$ on $G$, $G_A^0$, and $G_B^0$. Then, some process $p$ will transform $G_A^0$ into $G_A^1$, and $G_B^1 = p(G_B^0)$. Then Alice and Bob play $TRAV_2$ on $G$, $G_A^1$, and $G_B^1$. This process continues for an indefinite number of iterations $t$.*
+
+*Thus, a game of $ITRAV$ is an infinite iteration of $TRAV_2$ games on some graph $G$ with subgraphs changing between iterations by some process $p$. There are two measures for the communication complexity of $ITRAV_2(G,G_A^0,G_B^0,p)$: First, the *initial* communication cost, i.e. the communication at iteration $0$, and the *iterative* communication cost, i.e. the communication between one iteration and the next.*
+
+
+
+
+**Example 1**. *Suppose $p$ is a process that constructs $G_A^{t+1}$ from $G_A^t$ as follows: add one vertex $v \notin G_A^t$ and all edges $(v,u) \in E(G)$ with $(v,u) \notin E(G_A^t)$, $\forall u \in V(G_A^t)$ to create $H_A^t$. Then delete one vertex $v' \in H_A^t$ and all edges $(v',u') \in E(G)$ with $(v',u') \notin E(H_A^t)$, $\forall u' \in V(H_A^t)$. This finally creates $G_A^{t+1}$. The choice of vertex is uniformly random in both cases. The same applies for $G_B^t$.*
+
+*Then if in the initial iteration Alice and Bob send all of their inputs, every iteration afterwards Alice and Bob can solve $TRAV_2$ with only $2\log(n) + 1$ additional communication, where Alice communicates the vertices added and removed to Bob and Bob returns a single bit to denote if a traversal still exists.*
+
+
+
+The rest of this section is under construction!
+
+# The Multi-Party Traversal Problem
+
+In section <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a>, we considered $TRAV_2$, the communication game where both Alice and Bob computed the minimum length path from $v$ to $w$ using only edges in their subgraphs $G_A$ and $G_B$. Here, we generalize the problem to $TRAV_k$, with $k$ players.
+
+The rest of this section is under construction!
+
+# The Iterated Multi-Party Traversal Problem
+
+In section <a href="#sec:iter-two-party" data-reference-type="ref" data-reference="sec:iter-two-party">3</a>, we studied $ITRAV_2$, the iterative version of $TRAV_2$. Here, we study the iterated version of $TRAV_k$, namely $ITRAV_k$.
+
+The rest of this section is under construction!
+
+# Other Problems
+
+In the previous sections, we studied the $TRAV$ and $ITRAV$ class of problems in great detail. However, there are other problems pertaining to multi-party graph traversal that may be of interest to study, either as defunct examples (where solutions can be found without communicating) or where the resulting bounds are not interesting enough to merit further study. Parts of this section is under construction!
+
+## Unbounded Traversal
+
+
+**Claim 7**. *Suppose Alice and Bob access to the same information about graph $G$. Then the communication cost for any problem based on this alone is $0$.*
+
+
+
+One natural situation for this is in traversal, where Alice and Bob act as agents on a graph, and can traverse the graph to discover vertices and edges. If Alice and Bob start in the same connected component, as each has infinite compute power, each can explore the entire component and solve the problem independently.
+
+# Multi-Party Graph Traversal Case Studies
+
+Here, we survey a variety of real-world case studies where communication was a major bottleneck. Note that this section is a work in progress, especially in terms of formal citations.
+
+#### Air Transportation
+
+Large-scale transportation and infrastructure disruptions create a natural model for multi-party graph traversal. Consider the 2010 European volcanic ash shutdown: air-navigation service providers, airports, and airlines each control disjoint portions of airspace and schedules[^1]. Rerouting passengers is a shortest-path problem in a layered graph whose feasible vertices and edges change over time. No party can broadcast its full real-time state, both for operational and privacy reasons, so route feasibility must be computed with limited information exchange.
+
+#### Urban Transit
+
+Similar graph-traversal constraints appear in urban transit shutdowns and phased restorations, where distinct agencies own stations and tunnels. After Hurricane Sandy, service availability evolved over weeks, and agencies coordinated alternate routes under partial knowledge of what infrastructure was open[^2]. Highway detours after the I-95 bridge collapse in Philadelphia illustrate the same phenomenon in a road network: different operators own highway segments and toll roads, and a single failed cut edge forces traffic onto alternative paths with asymmetric knowledge of capacities[^3].
+
+#### Maritime Logistics
+
+The maritime and logistics examples are equally instructive. The 2021 Suez Canal blockage forced carriers to reroute around the Cape of Good Hope or wait, a decision that depends on schedule and capacity information held privately by shipping lines and port operators[^4]. When the Baltimore Key Bridge collapsed, access to the port was blocked and cargo was diverted to alternate ports, again requiring coordination across a sea–port–land graph with private operational constraints[^5].
+
+#### Infrastructure
+
+Communication bottlenecks become even sharper in critical infrastructure networks. The Colonial Pipeline cyber disruption similarly forced fuel logistics to reroute through alternate depots and terminals with incomplete visibility[^6]. And the 2021 Meta backbone withdrawal[^7] and the 2016 Dyn DNS attack[^8] show that digital services rely on reachability in routing and dependency graphs, where policy and security constraints limit information sharing across administrative domains.
+
+These cases motivate a theoretical study of multi-party graph traversal: agents must collaboratively decide reachability and shortest paths while their private subgraphs, capacities, or weights are not fully shareable. The fundamental question is how much communication is necessary, and how randomized protocols, sketches, or partial disclosures can reduce the burden while preserving correctness.
+
+# Weekly Contributions
+
+We summarize each member’s weekly contributions below:
+
+
+| Week | Ryan Batubara                                                                                                                                                                                                                                                                                                                          | Ivy Hawks                                                                                                                                                                                                                                                                                                                                                              | Darren Ho                                                                                                                                                                                                                                                                                                                                                     | Ciro Zhang                                                                                                                                                                                                                                                                                                                                 |
+|:-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Week | Ryan Batubara                                                                                                                                                                                                                                                                                                                          | Ivy Hawks                                                                                                                                                                                                                                                                                                                                                              | Darren Ho                                                                                                                                                                                                                                                                                                                                                     | Ciro Zhang                                                                                                                                                                                                                                                                                                                                 |
+|      | Work on formally writing up proofs for the trivial and other problems for our final report.                                                                                                                                                                                                                                            | Work on formally writing up the proofs for the two party graph traversal problems.                                                                                                                                                                                                                                                                                     | Work on formally writing up the problem statement and motivation for the problem for our final report.                                                                                                                                                                                                                                                        | Work on formally writing up the introduction/motivation for communication complexity for our final report.                                                                                                                                                                                                                                 |
+|      | Help Ivy make the website. Write Github actions to publish to Github Pages. Make subposts components. Wrote CSS.                                                                                                                                                                                                                       | Start a Github pages website with our latest findings. Convert latex to markdown using Pandoc.                                                                                                                                                                                                                                                                         | Write up formalized equality reduction in the report. Include the updated simplified procedure from the Professor.                                                                                                                                                                                                                                            | Integrate all notes so far into the report. Fix typos etc in the other people who are writing the report. Give formal definitions, research sections.                                                                                                                                                                                      |
+|      | Introduction section for report, defining communication complexity and various applications of problems.                                                                                                                                                                                                                               | Look into embedding 3SAT into graph problems. Useful to see techniques to embed hard problems into our problem, especially if we want to prove it is in NP.                                                                                                                                                                                                            | Look deeper into random protocols. In particular, develop a bank of random protocols that we can embed into our problem.                                                                                                                                                                                                                                      | Draw figures of our problem and embeddings in LaTeX for the report and poster.                                                                                                                                                                                                                                                             |
+|      | Looked at extreme case examples in real-life transport networks, e.g. failure of a node, failure of a “central hub” e.g. in the case on natural disasters, etc.                                                                                                                                                                        | Wrote down problem statement and preliminary problem solution in latex using hypergraph.                                                                                                                                                                                                                                                                               | Presented what random protocols are and several different random protocols, namely private and public randomness.                                                                                                                                                                                                                                             | Wrote notes on various variations of shortest path hypergraph problems.                                                                                                                                                                                                                                                                    |
+|      | Identified various problems that involved the readings that we have found so far. Determined multiparty communication networks with self-driving cars shows promise. Showed how set disjointness can be used to determine collisions with self-driving cars. Also identified a protocol to compute this. Formalized potential problem. | Presented two papers on communication complexity of graph properties to see if there is any information that could be applied to self driving cars. Also presented problems that we will begin working on, with identifying a class of problems where the communication complexity is o(n) by using the blackboard or third party model. Formalized potential problem. | Presented two papers on communication complexity of graph problems. One of them was on determining graph cliques, which can be used to determine whether or not there exists a clique, or a complete network. The other was to show a potential idea on how we can use ideas from other fields of study to compare with communication complexity. Took notes. | Presented a referee model, which we deduced to be the same as the blackboard model. We determined that this idea does not really work for our use case. Identified a critical flaw within our idea that was addressed. Found that our problem was too trivial and by removing/increasing certain assumptions the results remained trivial. |
+|      | Drafted communication problems with multiparty graph traversal avoiding intersections. Attempted hidden matching problem communication complexity but determined that it would be trivial by having each person explore all nodes.                                                                                                     | Drafted communication problems with multiparty weighted graph intersection. Determined that the majority of problems and solutions involved trivial solutions.                                                                                                                                                                                                         | Drafted communication problems with regards to black hole problems where there is a node that eliminates all players. Determined that finding it would be trivial by only communicating after 2 or n moves. Recorded meeting notes.                                                                                                                           | Drafted communication problems where everyone knows about their distance from each other but not any information about the graph. Determined that it would be trivial.                                                                                                                                                                     |
+
+Weekly contributions by team member.
+
+
+
+# Updated Proposal
+
+We take a graph, upon which there are players who wish to identify if the graph possesses some property. We wish to use this model to find the minimum communication required for each player to identify if this property exists. Each Player will receive some portion of the graph as their input–this can be either vertices, edges, or both. We mostly study reachability of vertices, in which the only paths considered valid are paths which use only the portions of the graph given to the players as inputs.
+
+For motivation, please see Section <a href="#sec:introduction" data-reference-type="ref" data-reference="sec:introduction">1</a> of the report.
+
+## Project Goals
+
+Sections <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a>, <a href="#sec:iter-two-party" data-reference-type="ref" data-reference="sec:iter-two-party">3</a>, <a href="#sec:multi-party" data-reference-type="ref" data-reference="sec:multi-party">4</a>, and <a href="#sec:iter-multi-party" data-reference-type="ref" data-reference="sec:iter-multi-party">5</a> formally define our problem statement and the full spectrum of problems we are considering for our project.
+
+Clearly, section <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a> is done. Much of the results for the remaining sections are also complete, and it only remains to formalize and type them up in LaTeX.
+
+## Actionables
+
+Therefore, this project can be summarized into three specific, actionables:
+
+1.  Finish writing this paper to outline the formal, technical communication complexity bounds for a given multi-agent traversal problem with certain constraints.
+
+2.  Finish porting the report to our website, whose link is available on the cover page of this report.
+
+3.  Give a poster presentation of the key results of the paper, with the intention of making the results applicable to a wider audience.
+
+Therefore, our work will remain theoretically grounded while remaining applicable for the wider computing community.
+
+## Deliverables
+
+We have three main deliverables:
+
+1.  A paper presenting actionable item 1 and 2.
+
+2.  A research poster of our key results, for actionable 3.
+
+3.  A website containing the paper and poster information, for actionable 3.
+
+To be more specific, the paper will take the form of a research paper, where we define the problems we are working on, prove bounds on these problems, and show how they model situations in the field of multi-agent graph traversal. The paper is our primary project output.
+
+Our detailed weekly progress is shown in the previous appendix section. In the remaining time, we plan for the following actionables for each person:
+
+
+| Week | Ryan Batubara                                               | Ivy Hawks                                                         | Darren Ho                                                                      | Ciro Zhang                                                                              |
+|:-----|:------------------------------------------------------------|:------------------------------------------------------------------|:-------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
+| Week | Ryan Batubara                                               | Ivy Hawks                                                         | Darren Ho                                                                      | Ciro Zhang                                                                              |
+|      | Finish the other problems section, with a focus on figures. | Finish the iterated multi-party section, with a focus on figures. | Make significant progress on the multi party section, with a focus on figures. | Make significant progress on the iterated multi-party section, with a focus on figures. |
+|      | Finish the multi-party section.                             | Finish the iterated multi-party section.                          | Finish the website port.                                                       | Move figures to first draft of poster.                                                  |
+|      | Polish paper and proofread website.                         | Polish website and proofread poster.                              | Polish poster and proofread paper.                                             | Polish poster and proofread paper.                                                      |
+
+Weekly plan
+
+
+
+Indeed, given our weekly contributions thus far we are on track to finishing the project with a week dedicated solely to polishing.
+
+[^1]: \footcite{AVIATION}.
+
+[^2]: \footcite{DONOVAN2017333}.
+
+[^3]: \footcite{penndot_i95_2026}.
+
+[^4]: \footcite{2023OCM...24506868W}.
+
+[^5]: \footcite{pbs_bridge_collapse_2024}.
+
+[^6]: \footcite{crs_colonial_pipeline_2021}.
+
+[^7]: \footcite{cloudflare_facebook_outage_2021}.
+
+[^8]: \footcite{deec66cadd6f410aac1f78a555982100}.
