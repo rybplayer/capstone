@@ -44,7 +44,7 @@ Randomized protocols allow parties to use random coins to reduce communication. 
 
 Two classic communication complexity problems are equality and disjointness. Equality asks whether $x=y$ for $x,y\in\{0,1\}^n$, and disjointness asks whether $X\cap Y=\emptyset$ for subsets of $[n]$. Both are useful for a range of lower-bound techniques, so we go through their communication complexity bounds below:
 
-**Claim 1**. *Equality, denoted $EQ: X \times Y \to \{0,1\}$, outputs $1$ if $x \in X$ and $y \in Y$ have $x=y$, and $0$ otherwise. $EQ$ has $D(EQ) = n$, $N^1(EQ) = n$, $N^0(EQ) = \Theta(\log n)$, and $R^{pub}_\varepsilon(EQ) = O(\log(1/\varepsilon))$.*
+**Claim 1**. Equality, denoted $EQ: X \times Y \to \{0,1\}$, outputs $1$ if $x \in X$ and $y \in Y$ have $x=y$, and $0$ otherwise. $EQ$ has $D(EQ) = n$, $N^1(EQ) = n$, $N^0(EQ) = \Theta(\log n)$, and $R^{pub}_\varepsilon(EQ) = O(\log(1/\varepsilon))$.
 
 *Proof.* First $D(EQ) = n$.
 
@@ -66,19 +66,15 @@ Now $N^0(EQ) = \log(n)$. This means we want to certify $x \neq y$.
 
 Now $R_\varepsilon^{pub}(EQ) = O(\log(1/\varepsilon))$.
 
-- Upper bound: Using shared randomness, pick $k$ strings $r^{(1)}, \ldots, r^{(k)} \in \{0,1\}^n$. For each $j \in [k]$, Alice sends
-  $$
-  b_j = \langle x, r^{(j)} \rangle \bmod 2.
-  $$
+- Upper bound: Using shared randomness, pick $k$ strings $r^{(1)}, \ldots, r^{(k)} \in \{0,1\}^n$. For each $j \in [k]$, Alice sends: 
+  $b_j = \langle x, r^{(j)} \rangle \bmod 2.$
   Bob computes $\langle y, r^{(j)} \rangle \bmod 2$ and checks equality for all $j \in [k]$. If $x = y$, this always succeeds. If $x \neq y$, each check fails independently with probability $1/2$, since the $r^{(j)}$ are uniformly random. Take $k = \lceil \log_2(1 / \epsilon) \rceil$.
 
 We do not prove it, but $R_\varepsilon^{pub}(EQ) = O(\log(n))$ with only private randomness. ◻
 
 
-**Claim 2**. *Set disjointness, denoted $DISJ$, interprets $x,y \in \{0,1\}^n$ as subsets $X,Y \subseteq [n]$ with*
-$$
-DISJ(x,y) = 1 \Leftrightarrow \forall i \in [n],\ x_i y_i = 0.
-$$
+**Claim 2**. Set disjointness, denoted $DISJ$, interprets $x,y \in \{0,1\}^n$ as subsets $X,Y \subseteq [n]$ with
+$DISJ(x,y) = 1 \Leftrightarrow \forall i \in [n],\ x_i y_i = 0.$
 *Then $D(DISJ) = \Theta(n)$, $N^1(DISJ) = \Theta(n)$, $N^0(DISJ) = \Theta(\log n)$, $R(DISJ) = \Theta(n)$. Furthermore, if $|X| = |Y| = k \ll n$, then $D(DISJ) = \Theta(k)$.*
 
 These bounds are well known in the literature, so we choose to omit the proof for $DISJ$ bounds. Both $EQ$ and $DISJ$ are very useful for *reductions*, where we embed a problem with known bounds in another, to show this other problem cannot be solved too efficiently. In particular, $EQ$ is “maximally complicated” for deterministic protocols and $DISJ$ is “maximally complicated” for randomized protocols, in the sense that $D(EQ) = n$ and $R(DISJ) = \Theta(n)$.
@@ -113,7 +109,7 @@ Sometimes, condition (1) fails, as in Figure (TRAV no path). In such a case, it 
 
 We begin by considering the case with only two players and thus two subgraphs. Let these players be named Alice and Bob, with subgraphs $G_A$ and $G_B$ respectively. Denote this problem by $trav_2$, i.e. the traversal problem for 2 players, where $|V(G)| = n$ and $|E(G)| = O(n^2)$.
 
-**Claim 3**. *Recall that equality $EQ$ has inputs $x,y \in \{0,1\}^n$, and $EQ(x,y) = 1$ $\Leftrightarrow$ $x = y$. Then $D(TRAV_2) \geq D(EQ)$ and so on.*
+**Claim 3**. Recall that equality $EQ$ has inputs $x,y \in \{0,1\}^n$, and $EQ(x,y) = 1$ $\Leftrightarrow$ $x = y$. Then $D(TRAV_2) \geq D(EQ)$ and so on.
 
 *Proof.* **Equality gadget.** We construct a gadget that enforces equality at a single bit position. The gadget is shown in Figure (equality gadget). The gadget consists of two parallel branches.
 
@@ -129,7 +125,7 @@ In the resulting graph, there exists a path from $v$ to $w$ if and only if all g
 
 We conclude by noting that the resulting graph $G$ has $\Theta(n)$ vertices and $\Theta(n)$ edges. ◻
 
-**Claim 4**. *Recall that in two-party $DISJ$, Alice and Bob are given sets $X, Y \subseteq [n]$ each. The goal is to determine whether $X \cap Y = \emptyset$. We claim $D(TRAV_2) \geq D(DISJ)$ and so on.*
+**Claim 4**. Recall that in two-party $DISJ$, Alice and Bob are given sets $X, Y \subseteq [n]$ each. The goal is to determine whether $X \cap Y = \emptyset$. We claim $D(TRAV_2) \geq D(DISJ)$ and so on.
 
 *Proof.* **Disjointness gadget.** We construct a gadget that enforces disjointness at a single entry $i \in [n]$. The gadget is shown in Figure (disjoint gadget). There, let $x_i$ and $y_1$ be indicator functions whether $i \in X$ and $i \in Y$ respectively. Then:
 
@@ -151,9 +147,9 @@ We conclude by noting that $|V(G)| = \Theta(n)$ and $|E(G)| = \Theta(n)$. ◻
 
 The previous proofs show that $TRAV_2$ is maximally complicated in terms of deterministic communication complexity, and almost maximally complicated in terms of randomized communication complexity. A natural follow up question is to ask if we can do better. That is, given some additional constraints, can we solve the problem with less communication asymptotically?
 
-**Definition 1**. *Define the $CTRAV_2$ problem as a $TRAV_2$ problem where $G_A$ and $G_B$ are guaranteed to be complete and connected.*
+**Definition 1**. Define the $CTRAV_2$ problem as a $TRAV_2$ problem where $G_A$ and $G_B$ are guaranteed to be complete and connected.
 
-**Claim 5**. *$D(CTRAV_2) \geq D(DISJ)$ and so on.*
+**Claim 5**. $D(CTRAV_2) \geq D(DISJ)$ and so on.
 
 *Proof.* If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
 
@@ -161,9 +157,9 @@ Since $G_A$ and $G_B$ are complete, then a valid path occurs if and only if $V(G
 
 This tells us that the local structure of $G_A$ and $G_B$ alone is not a significant source of communication difficulty. That is, even when $G_A$ and $G_B$ are complete graphs, we do not get obviously better lower bounds.
 
-**Definition 2**. *Define $STRAV_2$ as a $TRAV_2$ problem where $E(G) = O(n)$, $E(G_A) = O(n)$, and $E(G_B) = O(n)$. In other words, the graph $G$ is sparse and $G_A$, $G_B$ are sparse too.*
+**Definition 2**. Define $STRAV_2$ as a $TRAV_2$ problem where $E(G) = O(n)$, $E(G_A) = O(n)$, and $E(G_B) = O(n)$. In other words, the graph $G$ is sparse and $G_A$, $G_B$ are sparse too.
 
-**Claim 6**. *$D(STRAV_2) \geq D(DISJ)$ and so on.*
+**Claim 6**. $D(STRAV_2) \geq D(DISJ)$ and so on.
 
 *Proof.* Consider the case where $G_A$ and $G_B$ are connected. If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
 
@@ -177,13 +173,13 @@ In section 2, we considered $TRAV_2$, the communication game where both Alice an
 
 For example, consider the motivating problem 1.1. A user may want to send multiple queries in succession, while having partial information of the state of the system based on their previous queries. We try to generalize this notion here.
 
-**Definition 3**. *Let $ITRAV_2$ be the following communication game: A graph $G = (V,E)$ is known, and two players Alice and Bob receive initial subgraphs $G_A^0$ and $G_B^0$ of $G$. Call this iteration $t = 0$. Alice and Bob then play $TRAV_2$ on $G$, $G_A^0$, and $G_B^0$. Then, some process $p$ will transform $G_A^0$ into $G_A^1$, and $G_B^1 = p(G_B^0)$. Then Alice and Bob play $TRAV_2$ on $G$, $G_A^1$, and $G_B^1$. This process continues for an indefinite number of iterations $t$.*
+**Definition 3**. Let $ITRAV_2$ be the following communication game: A graph $G = (V,E)$ is known, and two players Alice and Bob receive initial subgraphs $G_A^0$ and $G_B^0$ of $G$. Call this iteration $t = 0$. Alice and Bob then play $TRAV_2$ on $G$, $G_A^0$, and $G_B^0$. Then, some process $p$ will transform $G_A^0$ into $G_A^1$, and $G_B^1 = p(G_B^0)$. Then Alice and Bob play $TRAV_2$ on $G$, $G_A^1$, and $G_B^1$. This process continues for an indefinite number of iterations $t$.
 
-*Thus, a game of $ITRAV$ is an infinite iteration of $TRAV_2$ games on some graph $G$ with subgraphs changing between iterations by some process $p$. There are two measures for the communication complexity of $ITRAV_2(G,G_A^0,G_B^0,p)$: First, the *initial* communication cost, i.e. the communication at iteration $0$, and the *iterative* communication cost, i.e. the communication between one iteration and the next.*
+Thus, a game of $ITRAV$ is an infinite iteration of $TRAV_2$ games on some graph $G$ with subgraphs changing between iterations by some process $p$. There are two measures for the communication complexity of $ITRAV_2(G,G_A^0,G_B^0,p)$: First, the *initial* communication cost, i.e. the communication at iteration $0$, and the *iterative* communication cost, i.e. the communication between one iteration and the next.
 
-**Example 1**. *Suppose $p$ is a process that constructs $G_A^{t+1}$ from $G_A^t$ as follows: add one vertex $v \notin G_A^t$ and all edges $(v,u) \in E(G)$ with $(v,u) \notin E(G_A^t)$, $\forall u \in V(G_A^t)$ to create $H_A^t$. Then delete one vertex $v' \in H_A^t$ and all edges $(v',u') \in E(G)$ with $(v',u') \notin E(H_A^t)$, $\forall u' \in V(H_A^t)$. This finally creates $G_A^{t+1}$. The choice of vertex is uniformly random in both cases. The same applies for $G_B^t$.*
+**Example 1**. Suppose $p$ is a process that constructs $G_A^{t+1}$ from $G_A^t$ as follows: add one vertex $v \notin G_A^t$ and all edges $(v,u) \in E(G)$ with $(v,u) \notin E(G_A^t)$, $\forall u \in V(G_A^t)$ to create $H_A^t$. Then delete one vertex $v' \in H_A^t$ and all edges $(v',u') \in E(G)$ with $(v',u') \notin E(H_A^t)$, $\forall u' \in V(H_A^t)$. This finally creates $G_A^{t+1}$. The choice of vertex is uniformly random in both cases. The same applies for $G_B^t$.
 
-*Then if in the initial iteration Alice and Bob send all of their inputs, every iteration afterwards Alice and Bob can solve $TRAV_2$ with only $2\log(n) + 1$ additional communication, where Alice communicates the vertices added and removed to Bob and Bob returns a single bit to denote if a traversal still exists.*
+Then if in the initial iteration Alice and Bob send all of their inputs, every iteration afterwards Alice and Bob can solve $TRAV_2$ with only $2\log(n) + 1$ additional communication, where Alice communicates the vertices added and removed to Bob and Bob returns a single bit to denote if a traversal still exists.
 
 The rest of this section is under construction!
 
@@ -205,7 +201,7 @@ In the previous sections, we studied the $TRAV$ and $ITRAV$ class of problems in
 
 ## Unbounded Traversal
 
-**Claim 7**. *Suppose Alice and Bob access to the same information about graph $G$. Then the communication cost for any problem based on this alone is $0$.*
+**Claim 7**. Suppose Alice and Bob access to the same information about graph $G$. Then the communication cost for any problem based on this alone is $0$.
 
 One natural situation for this is in traversal, where Alice and Bob act as agents on a graph, and can traverse the graph to discover vertices and edges. If Alice and Bob start in the same connected component, as each has infinite compute power, each can explore the entire component and solve the problem independently.
 
