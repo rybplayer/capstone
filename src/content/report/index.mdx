@@ -33,9 +33,8 @@ We briefly define the various measures of communication complexity used in this 
 
 A *nondeterministic protocol* for $f$ has two parts: First, an external party has access to $x$ and $y$, and provides advice $a$ to both players. Then, the players, with access to $a$ and their respective input, communicate to decide whether to output $0$ or $1$. Let $\Pi(x,y,a)$ denote the output of the protocol, which we say is correct if
 
--   If $f(x,y) = 1$, then $\exists a$ with $\Pi(x,y,a) = 1$.
-
--   If $f(x,y) = 0$, then $\forall a$, $\Pi(x,y,a) = 0$.
+- If $f(x,y) = 1$, then $\exists a$ with $\Pi(x,y,a) = 1$.
+- If $f(x,y) = 0$, then $\forall a$, $\Pi(x,y,a) = 0$.
 
 The cost of $\Pi$ is the sum of $a$ and any communication between players. The *nondeterministic* cost of $f$, denoted $N^1(f)$, is the minimal cost of a protocol computing $f$. The *co-nondeterministic* cost of $f$ is the nondeterministic cost for $1-f$.
 
@@ -45,35 +44,42 @@ Randomized protocols allow parties to use random coins to reduce communication. 
 
 Two classic communication complexity problems are equality and disjointness. Equality asks whether $x=y$ for $x,y\in\{0,1\}^n$, and disjointness asks whether $X\cap Y=\emptyset$ for subsets of $[n]$. Both are useful for a range of lower-bound techniques, so we go through their communication complexity bounds below:
 
-**Claim 1**. Equality, denoted $EQ: X \times Y \to \{0,1\}$, outputs $1$ if $x \in X$ and $y \in Y$ have $x=y$, and $0$ otherwise. $EQ$ has $D(EQ) = n$, $N^1(EQ) = n$, $N^0(EQ) = \Theta(\log n)$, and $R^{pub}_\varepsilon(EQ) = O(\log(1/\varepsilon))$.
+**Claim 1**. *Equality, denoted $EQ: X \times Y \to \{0,1\}$, outputs $1$ if $x \in X$ and $y \in Y$ have $x=y$, and $0$ otherwise. $EQ$ has $D(EQ) = n$, $N^1(EQ) = n$, $N^0(EQ) = \Theta(\log n)$, and $R^{pub}_\varepsilon(EQ) = O(\log(1/\varepsilon))$.*
 
 *Proof.* First $D(EQ) = n$.
 
--   Upper bound: Alice sends all $n$ bits of $x$ to Bob, who compared it to $y$ and outputs.
+- Upper bound: Alice sends all $n$ bits of $x$ to Bob, who compared it to $y$ and outputs.
 
--   Lower bound: Any deterministic protocol partitions the $\{0,1\}^n \times \{0,1\}^n$ matrix $M_EQ$ into combinatorial $z$-rectangles, i.e. regions $R = A \times B \subseteq X \times Y$ where $f(a,b) = z$ for all $a \in A$, $b \in B$, and $z \in \{0,1\}$. Clearly $M_EQ = I_{\{0,1\}^n \times \{0,1\}^n}$. Hence there are $2^n$ 1-rectangles or at least $2^n$ leaves in the protocol tree. Thus $D(f) \geq \log_2(2^n) = n$.
+- Lower bound: Any deterministic protocol partitions the $\{0,1\}^n \times \{0,1\}^n$ matrix $M_{EQ}$ into combinatorial $z$-rectangles, i.e. regions $R = A \times B \subseteq X \times Y$ where $f(a,b) = z$ for all $a \in A$, $b \in B$, and $z \in \{0,1\}$. Clearly $M_{EQ} = I_{\{0,1\}^n \times \{0,1\}^n}$. Hence there are $2^n$ 1-rectangles or at least $2^n$ leaves in the protocol tree. Thus $D(f) \geq \log_2(2^n) = n$.
 
 Now $N^1(EQ) = n$. This means we want to certify $x = y$.
 
--   Upper bound: The prover sends $x$ to both players. Both players check if it matches their input. If so, accept.
+- Upper bound: The prover sends $x$ to both players. Both players check if it matches their input. If so, accept.
 
--   Lower bound: Similar to $D(EQ)$, we need $2^n$ distinct certificates to cover all possible inputs. Hence certificate length $\geq \log_2(2^n) = n$.
+- Lower bound: Similar to $D(EQ)$, we need $2^n$ distinct certificates to cover all possible inputs. Hence certificate length $\geq \log_2(2^n) = n$.
 
 Now $N^0(EQ) = \log(n)$. This means we want to certify $x \neq y$.
 
--   The prover computes an index $i \in [n]$ where $x_i \neq y_i$. This takes $\log(n)$ bits to communicate to Alice and Bob, who can exchange bits at that coordinate and witness if they differ.
+- The prover computes an index $i \in [n]$ where $x_i \neq y_i$. This takes $\log(n)$ bits to communicate to Alice and Bob, who can exchange bits at that coordinate and witness if they differ.
 
--   There are $n$ possible indices $i$. If certificates had length $< \log(n)$, there would be $< n$ certificates which cannot cover all the possibilities.
+- There are $n$ possible indices $i$. If certificates had length $< \log(n)$, there would be $< n$ certificates which cannot cover all the possibilities.
 
 Now $R_\varepsilon^{pub}(EQ) = O(\log(1/\varepsilon))$.
 
--   Upper bound: Using shared randomness, pick $k$ strings $r^{(1)}, \ldots, r^{(k)} \in \{0,1\}^n$. For each $j \in [k]$, Alice sends $b_j = \langle x, r^{(j)} \rangle \text{mod } 2$. Bob computes $\langle y, r^{(j)}\rangle \text{mod }2$ and checks equality for all $j \in [k]$. If $x = y$, this always succeeds. If $x \neq y$, each check fails independently with probability $1/2$, since the $r^{(j)}$ are uniformly random. Take $k = \lceil \log_2(1 / \epsilon) \rceil$.
+- Upper bound: Using shared randomness, pick $k$ strings $r^{(1)}, \ldots, r^{(k)} \in \{0,1\}^n$. For each $j \in [k]$, Alice sends
+  $$
+  b_j = \langle x, r^{(j)} \rangle \bmod 2.
+  $$
+  Bob computes $\langle y, r^{(j)} \rangle \bmod 2$ and checks equality for all $j \in [k]$. If $x = y$, this always succeeds. If $x \neq y$, each check fails independently with probability $1/2$, since the $r^{(j)}$ are uniformly random. Take $k = \lceil \log_2(1 / \epsilon) \rceil$.
 
 We do not prove it, but $R_\varepsilon^{pub}(EQ) = O(\log(n))$ with only private randomness. ◻
 
 
-**Claim 2**. Set disjointness, denoted $DISJ$, interprets $x,y \in \{0,1\}^n$ as subsets $X,Y \subseteq [n]$ with $$\begin{aligned}
-    DISJ(x,y) = 1 \iff \forall i \in [n], x_i y_i = 0.\end{aligned}$$ Then $D(DISJ) = \Theta(n)$, $N^1(DISJ) = \Theta(n)$, $N^0(DISJ) = \Theta(\log n)$, $R(DISJ) = \Theta(n)$. Furthermore, if $|X| = |Y| = k \ll n$, then $D(DISJ) = \Theta(k)$.
+**Claim 2**. *Set disjointness, denoted $DISJ$, interprets $x,y \in \{0,1\}^n$ as subsets $X,Y \subseteq [n]$ with*
+$$
+DISJ(x,y) = 1 \Leftrightarrow \forall i \in [n],\ x_i y_i = 0.
+$$
+*Then $D(DISJ) = \Theta(n)$, $N^1(DISJ) = \Theta(n)$, $N^0(DISJ) = \Theta(\log n)$, $R(DISJ) = \Theta(n)$. Furthermore, if $|X| = |Y| = k \ll n$, then $D(DISJ) = \Theta(k)$.*
 
 These bounds are well known in the literature, so we choose to omit the proof for $DISJ$ bounds. Both $EQ$ and $DISJ$ are very useful for *reductions*, where we embed a problem with known bounds in another, to show this other problem cannot be solved too efficiently. In particular, $EQ$ is “maximally complicated” for deterministic protocols and $DISJ$ is “maximally complicated” for randomized protocols, in the sense that $D(EQ) = n$ and $R(DISJ) = \Theta(n)$.
 
@@ -95,9 +101,9 @@ We begin with the simplest non-trivial formulation of our problem, inspired by E
 
 Consider a graph $G = (V,E)$ and subgraphs $G_1, \ldots, G_k \subset G$. Let $G_i = (V_i, E_i)$ for these subgraphs. For now let us suppose $G$ is unweighted and undirected. The subgraphs need not cover $G$ and can overlap. Each player $i$ knows $G$ and $G_i$, but not the other player’s graphs. The goal is, given some starting vertex $v \in V$, and some end vertex $w \in V$ to:
 
-1.  Identify if it is possible to construct a path $v, v_1, \dots, v_l, w$ such that every edge on the path is in $\bigcup_{i=0}^{k} E_i$.
+1. Identify if it is possible to construct a path $v, v_1, \dots, v_l, w$ such that every edge on the path is in $\bigcup_{i=0}^{k} E_i$.
 
-2.  If such a path exists, find the minimum number of edges needed to get from $v$ to $w$, while using only edges belonging to $\bigcup_{i=0}^{k} E_i$.
+2. If such a path exists, find the minimum number of edges needed to get from $v$ to $w$, while using only edges belonging to $\bigcup_{i=0}^{k} E_i$.
 
 If some $e = (u,v) \in G_i$, we must have $u,v \in V(G_i)$. But the converse is not always true.
 
@@ -107,13 +113,13 @@ Sometimes, condition (1) fails, as in Figure (TRAV no path). In such a case, it 
 
 We begin by considering the case with only two players and thus two subgraphs. Let these players be named Alice and Bob, with subgraphs $G_A$ and $G_B$ respectively. Denote this problem by $trav_2$, i.e. the traversal problem for 2 players, where $|V(G)| = n$ and $|E(G)| = O(n^2)$.
 
-**Claim 3**. Recall that equality $EQ$ has inputs $x,y \in \{0,1\}^n$, and $EQ(x,y) = 1$ iff $x = y$. Then $D(TRAV_2) \geq D(EQ)$ and so on.
+**Claim 3**. *Recall that equality $EQ$ has inputs $x,y \in \{0,1\}^n$, and $EQ(x,y) = 1$ $\Leftrightarrow$ $x = y$. Then $D(TRAV_2) \geq D(EQ)$ and so on.*
 
 *Proof.* **Equality gadget.** We construct a gadget that enforces equality at a single bit position. The gadget is shown in Figure (equality gadget). The gadget consists of two parallel branches.
 
-1.  The top branch corresponds to the assignment $x_i = y_i = 1$,
+1. The top branch corresponds to the assignment $x_i = y_i = 1$,
 
-2.  The bottom branch corresponds to the assignment $x_i = y_i = 0$.
+2. The bottom branch corresponds to the assignment $x_i = y_i = 0$.
 
 The idea is that Alice enables exactly one entry node of the gadget depending on $x_i$, and Bob enables exactly one exit node depending on $y_i$. A path exists through the gadget if and only if Alice and Bob select nodes on the same branch, which holds exactly when $x_i = y_i$.
 
@@ -123,15 +129,15 @@ In the resulting graph, there exists a path from $v$ to $w$ if and only if all g
 
 We conclude by noting that the resulting graph $G$ has $\Theta(n)$ vertices and $\Theta(n)$ edges. ◻
 
-**Claim 4**. Recall that in two-party $DISJ$, Alice and Bob are given sets $X, Y \subseteq [n]$ each. The goal is to determine whether $X \cap Y = \emptyset$. We claim $D(TRAV_2) \geq D(DISJ)$ and so on.
+**Claim 4**. *Recall that in two-party $DISJ$, Alice and Bob are given sets $X, Y \subseteq [n]$ each. The goal is to determine whether $X \cap Y = \emptyset$. We claim $D(TRAV_2) \geq D(DISJ)$ and so on.*
 
 *Proof.* **Disjointness gadget.** We construct a gadget that enforces disjointness at a single entry $i \in [n]$. The gadget is shown in Figure (disjoint gadget). There, let $x_i$ and $y_1$ be indicator functions whether $i \in X$ and $i \in Y$ respectively. Then:
 
-1.  The top branch corresponds to when $x_i$ has the element but $y_i$ does not
+1. The top branch corresponds to when $x_i$ has the element but $y_i$ does not
 
-2.  The middle branch corresponds to when $x_i$ and $y_i$ do not have the element
+2. The middle branch corresponds to when $x_i$ and $y_i$ do not have the element
 
-3.  The top branch corresponds to when $y_i$ has the element but $x_i$ does not
+3. The top branch corresponds to when $y_i$ has the element but $x_i$ does not
 
 In other words, there is no path left to right if $i \in X \cap Y$.
 
@@ -147,7 +153,7 @@ The previous proofs show that $TRAV_2$ is maximally complicated in terms of dete
 
 **Definition 1**. *Define the $CTRAV_2$ problem as a $TRAV_2$ problem where $G_A$ and $G_B$ are guaranteed to be complete and connected.*
 
-**Claim 5**. $D(CTRAV_2) \geq D(DISJ)$ and so on.
+**Claim 5**. *$D(CTRAV_2) \geq D(DISJ)$ and so on.*
 
 *Proof.* If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
 
@@ -157,7 +163,7 @@ This tells us that the local structure of $G_A$ and $G_B$ alone is not a signifi
 
 **Definition 2**. *Define $STRAV_2$ as a $TRAV_2$ problem where $E(G) = O(n)$, $E(G_A) = O(n)$, and $E(G_B) = O(n)$. In other words, the graph $G$ is sparse and $G_A$, $G_B$ are sparse too.*
 
-**Claim 6**. $D(STRAV_2) \geq D(DISJ)$ and so on.
+**Claim 6**. *$D(STRAV_2) \geq D(DISJ)$ and so on.*
 
 *Proof.* Consider the case where $G_A$ and $G_B$ are connected. If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
 
@@ -199,7 +205,7 @@ In the previous sections, we studied the $TRAV$ and $ITRAV$ class of problems in
 
 ## Unbounded Traversal
 
-**Claim 7**. Suppose Alice and Bob access to the same information about graph $G$. Then the communication cost for any problem based on this alone is $0$.
+**Claim 7**. *Suppose Alice and Bob access to the same information about graph $G$. Then the communication cost for any problem based on this alone is $0$.*
 
 One natural situation for this is in traversal, where Alice and Bob act as agents on a graph, and can traverse the graph to discover vertices and edges. If Alice and Bob start in the same connected component, as each has infinite compute power, each can explore the entire component and solve the problem independently.
 
@@ -257,11 +263,9 @@ Clearly, section 2 is done. Much of the results for the remaining sections are a
 
 Therefore, this project can be summarized into three specific, actionables:
 
-1.  Finish writing this paper to outline the formal, technical communication complexity bounds for a given multi-agent traversal problem with certain constraints.
-
-2.  Finish porting the report to our website, whose link is available on the cover page of this report.
-
-3.  Give a poster presentation of the key results of the paper, with the intention of making the results applicable to a wider audience.
+1. Finish writing this paper to outline the formal, technical communication complexity bounds for a given multi-agent traversal problem with certain constraints.
+2. Finish porting the report to our website, whose link is available on the cover page of this report.
+3. Give a poster presentation of the key results of the paper, with the intention of making the results applicable to a wider audience.
 
 Therefore, our work will remain theoretically grounded while remaining applicable for the wider computing community.
 
@@ -269,11 +273,9 @@ Therefore, our work will remain theoretically grounded while remaining applicabl
 
 We have three main deliverables:
 
-1.  A paper presenting actionable item 1 and 2.
-
-2.  A research poster of our key results, for actionable 3.
-
-3.  A website containing the paper and poster information, for actionable 3.
+1. A paper presenting actionable item 1 and 2.
+2. A research poster of our key results, for actionable 3.
+3. A website containing the paper and poster information, for actionable 3.
 
 To be more specific, the paper will take the form of a research paper, where we define the problems we are working on, prove bounds on these problems, and show how they model situations in the field of multi-agent graph traversal. The paper is our primary project output.
 
@@ -288,14 +290,14 @@ Our detailed weekly progress is shown in the previous appendix section. In the r
 
 Weekly plan
 
-[^1]: Eurocontrol, *Ash-cloud of April and May 2010: Impact on Air Traffic* (2010). https://www.eurocontrol.int/publication/ash-cloud-april-and-may-2010-impact-air-traffic
-[^2]: Donovan, B. & Work, D. B., “Empirically quantifying city-scale transportation system resilience to extreme events,” *Transportation Research Part C* 79 (2017), 333–346. https://doi.org/10.1016/j.trc.2017.03.002
-[^3]: PennDOT, “Surveying on I-95 Girard Point Bridge Improvement Project in Southwest Philadelphia” (Feb 2026). https://www.pa.gov/agencies/penndot/news-and-media/newsroom/district-6/2026/surveying-on-i-95-girard-point-bridge-improvement-project-in-phi
-[^4]: Wan, Z. et al., “Analysis of the impact of Suez Canal blockage on global maritime transportation networks,” (2023). https://ui.adsabs.harvard.edu/abs/2023OCM...24506868W/abstract
-[^5]: PBS NewsHour, “How Baltimore’s Key Bridge collapse will affect supply chains and the economy” (Mar 28, 2024). https://www.pbs.org/newshour/nation/how-baltimores-key-bridge-collapse-will-affect-supply-chains-and-the-economy
-[^6]: Congressional Research Service, “Colonial Pipeline: The DarkSide Strikes” (IN11667, May 11, 2021). https://www.everycrsreport.com/reports/IN11667.html
-[^7]: Cloudflare, “Understanding how Facebook disappeared from the Internet” (Oct 4, 2021). https://blog.cloudflare.com/october-2021-facebook-outage/
-[^8]: RIPE Labs, “A quick look at the attack on Dyn” (Oct 24, 2016). https://labs.ripe.net/author/massimo_candela/a-quick-look-at-the-attack-on-dyn/
+[^1]: Eurocontrol, *Ash-cloud of April and May 2010: Impact on Air Traffic* (2010). https://www.eurocontrol.int/publication/ash-cloud-april-and-may-2010-impact-air-traffic  
+[^2]: Donovan, B. & Work, D. B., “Empirically quantifying city-scale transportation system resilience to extreme events,” *Transportation Research Part C* 79 (2017), 333–346. https://doi.org/10.1016/j.trc.2017.03.002  
+[^3]: PennDOT, “Surveying on I-95 Girard Point Bridge Improvement Project in Southwest Philadelphia” (Feb 2026). https://www.pa.gov/agencies/penndot/news-and-media/newsroom/district-6/2026/surveying-on-i-95-girard-point-bridge-improvement-project-in-phi  
+[^4]: Wan, Z. et al., “Analysis of the impact of Suez Canal blockage on global maritime transportation networks,” (2023). https://ui.adsabs.harvard.edu/abs/2023OCM...24506868W/abstract  
+[^5]: PBS NewsHour, “How Baltimore’s Key Bridge collapse will affect supply chains and the economy” (Mar 28, 2024). https://www.pbs.org/newshour/nation/how-baltimores-key-bridge-collapse-will-affect-supply-chains-and-the-economy  
+[^6]: Congressional Research Service, “Colonial Pipeline: The DarkSide Strikes” (IN11667, May 11, 2021). https://www.everycrsreport.com/reports/IN11667.html  
+[^7]: Cloudflare, “Understanding how Facebook disappeared from the Internet” (Oct 4, 2021). https://blog.cloudflare.com/october-2021-facebook-outage/  
+[^8]: RIPE Labs, “A quick look at the attack on Dyn” (Oct 24, 2016). https://labs.ripe.net/author/massimo_candela/a-quick-look-at-the-attack-on-dyn/  
 
-[^raoyehudayoff]: Rao, A. & Yehudayoff, A., *Communication Complexity and Applications* (Cambridge University Press, 2019). https://www.cambridge.org/core/books/communication-complexity/5F44993E3B2597174B71D3F21E748443
-[^roughgarden]: Roughgarden, T., *Communication Complexity (for Algorithm Designers)* (lecture notes). https://theory.stanford.edu/~tim/w15/l/w15.pdf
+[^raoyehudayoff]: Rao, A. & Yehudayoff, A., *Communication Complexity and Applications* (Cambridge University Press, 2019). https://www.cambridge.org/core/books/communication-complexity/5F44993E3B2597174B71D3F21E748443  
+[^roughgarden]: Roughgarden, T., *Communication Complexity (for Algorithm Designers)* (lecture notes). https://theory.stanford.edu/~tim/w15/l/w15.pdf  
