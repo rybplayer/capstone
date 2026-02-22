@@ -29,7 +29,7 @@ These lower bounds have a variety of applications for algorithm, system and soft
 
 ## Communication complexity basics
 
-We briefly define the various measures of communication complexity used in this report. Interested readers should see \cite{RaoYehudayoffBook} or \cite{RoughgardenBook} for a more thorough introduction. Let $f: X \times Y \to \{0,1\}$ be a function. In the two-party model, Alice receives $x \in X$ and Bob receives $y \in Y$, and they wish to compute $f(x,y)$. A *deterministic protocol* is a binary decision tree whose nodes are labeled by which party speaks and whose edges are labeled by bits $0$ or $1$. The *transcript* $\pi(x,y)$ is the sequence of bits exchanged for a particular input $x$ and $y$. The protocol must output $f(x,y)$ at a leaf. The *deterministic* communication complexity $D(f)$ is the minimum, over all correct protocols, of the maximum transcript length (or equivalently, protocol tree depth) over all inputs.
+We briefly define the various measures of communication complexity used in this report. Interested readers should see Rao–Yehudayoff[^raoyehudayoff] or Roughgarden[^roughgarden] for a more thorough introduction. Let $f: X \times Y \to \{0,1\}$ be a function. In the two-party model, Alice receives $x \in X$ and Bob receives $y \in Y$, and they wish to compute $f(x,y)$. A *deterministic protocol* is a binary decision tree whose nodes are labeled by which party speaks and whose edges are labeled by bits $0$ or $1$. The *transcript* $\pi(x,y)$ is the sequence of bits exchanged for a particular input $x$ and $y$. The protocol must output $f(x,y)$ at a leaf. The *deterministic* communication complexity $D(f)$ is the minimum, over all correct protocols, of the maximum transcript length (or equivalently, protocol tree depth) over all inputs.
 
 A *nondeterministic protocol* for $f$ has two parts: First, an external party has access to $x$ and $y$, and provides advice $a$ to both players. Then, the players, with access to $a$ and their respective input, communicate to decide whether to output $0$ or $1$. Let $\Pi(x,y,a)$ denote the output of the protocol, which we say is correct if
 
@@ -45,10 +45,7 @@ Randomized protocols allow parties to use random coins to reduce communication. 
 
 Two classic communication complexity problems are equality and disjointness. Equality asks whether $x=y$ for $x,y\in\{0,1\}^n$, and disjointness asks whether $X\cap Y=\emptyset$ for subsets of $[n]$. Both are useful for a range of lower-bound techniques, so we go through their communication complexity bounds below:
 
-**Claim 1**. *Equality, denoted $EQ: X \times Y \to \{0,1\}$, outputs $1$ if $x \in X$ and $y \in Y$ have $x=y$, and $0$ otherwise. $EQ$ has $D(EQ) = n$, $N^1(EQ) = n$, $N^0(EQ) = \Theta(\log n)$, and $R^{pub}_\varepsilon(EQ) = O(\log(1/\varepsilon))$.*
-
-
-
+**Claim 1**. Equality, denoted $EQ: X \times Y \to \{0,1\}$, outputs $1$ if $x \in X$ and $y \in Y$ have $x=y$, and $0$ otherwise. $EQ$ has $D(EQ) = n$, $N^1(EQ) = n$, $N^0(EQ) = \Theta(\log n)$, and $R^{pub}_\varepsilon(EQ) = O(\log(1/\varepsilon))$.
 
 *Proof.* First $D(EQ) = n$.
 
@@ -72,12 +69,11 @@ Now $R_\varepsilon^{pub}(EQ) = O(\log(1/\varepsilon))$.
 
 -   Upper bound: Using shared randomness, pick $k$ strings $r^{(1)}, \ldots, r^{(k)} \in \{0,1\}^n$. For each $j \in [k]$, Alice sends $b_j = \langle x, r^{(j)} \rangle \text{mod } 2$. Bob computes $\langle y, r^{(j)}\rangle \text{mod }2$ and checks equality for all $j \in [k]$. If $x = y$, this always succeeds. If $x \neq y$, each check fails independently with probability $1/2$, since the $r^{(j)}$ are uniformly random. Take $k = \lceil \log_2(1 / \epsilon) \rceil$.
 
-We do not prove it, but $R_\varepsilon^{pub}(EQ) = O(\log(n))$ with only private randomness. ◻
+We do not prove it, but $R_\varepsilon^{pub}(EQ) = O(\log(n))$ with only private randomness. ◻
 
 
-**Claim 2**. *Set disjointness, denoted $DISJ$, interprets $x,y \in \{0,1\}^n$ as subsets $X,Y \subseteq [n]$ with $$\begin{aligned}
-    DISJ(x,y) = 1 \iff \forall i \in [n], x_i y_i = 0.\end{aligned}$$ Then $D(DISJ) = \Theta(n)$, $N^1(DISJ) = \Theta(n)$, $N^0(DISJ) = \Theta(\log n)$, $R(DISJ) = \Theta(n)$. Furthermore, if $|X| = |Y| = k \ll n$, then $D(DISJ) = \Theta(k)$.*
-
+**Claim 2**. Set disjointness, denoted $DISJ$, interprets $x,y \in \{0,1\}^n$ as subsets $X,Y \subseteq [n]$ with $$\begin{aligned}
+    DISJ(x,y) = 1 \iff \forall i \in [n], x_i y_i = 0.\end{aligned}$$ Then $D(DISJ) = \Theta(n)$, $N^1(DISJ) = \Theta(n)$, $N^0(DISJ) = \Theta(\log n)$, $R(DISJ) = \Theta(n)$. Furthermore, if $|X| = |Y| = k \ll n$, then $D(DISJ) = \Theta(k)$.
 
 These bounds are well known in the literature, so we choose to omit the proof for $DISJ$ bounds. Both $EQ$ and $DISJ$ are very useful for *reductions*, where we embed a problem with known bounds in another, to show this other problem cannot be solved too efficiently. In particular, $EQ$ is “maximally complicated” for deterministic protocols and $DISJ$ is “maximally complicated” for randomized protocols, in the sense that $D(EQ) = n$ and $R(DISJ) = \Theta(n)$.
 
@@ -91,54 +87,45 @@ This section is under construction, as we are still considering new variants of 
 
 ## Motivating our problem
 
-In this and the following sections, we will define and show communication bounds for a series of problems pertaining to multi-party graph traversal. Please see Appendix <a href="#appendix:case-studies" data-reference-type="ref" data-reference="appendix:case-studies">7</a> for a variety of case studies that motivates the following problem definitions.
+In this and the following sections, we will define and show communication bounds for a series of problems pertaining to multi-party graph traversal. Please see Appendix 7 for a variety of case studies that motivates the following problem definitions.
 
 ## Problem Statement
 
-We begin with the simplest non-trivial formulation of our problem, inspired by <a href="#ex:motivating-problem" data-reference-type="ref" data-reference="ex:motivating-problem">1.1</a>.
+We begin with the simplest non-trivial formulation of our problem, inspired by Example 1.1.
 
 Consider a graph $G = (V,E)$ and subgraphs $G_1, \ldots, G_k \subset G$. Let $G_i = (V_i, E_i)$ for these subgraphs. For now let us suppose $G$ is unweighted and undirected. The subgraphs need not cover $G$ and can overlap. Each player $i$ knows $G$ and $G_i$, but not the other player’s graphs. The goal is, given some starting vertex $v \in V$, and some end vertex $w \in V$ to:
 
-1.  Identify if it is possible to construct a path $v, v_1, \dots, v_l, w$ such that every edge on the path is in $\bigcup_{i=0}^{k} E_i$. <span id="prob:traversal-exists-path" label="prob:traversal-exists-path"></span>
+1.  Identify if it is possible to construct a path $v, v_1, \dots, v_l, w$ such that every edge on the path is in $\bigcup_{i=0}^{k} E_i$.
 
-2.  If such a path exists, find the minimum number of edges needed to get from $v$ to $w$, while using only edges belonging to $\bigcup_{i=0}^{k} E_i$. <span id="prob:traversal-min-path" label="prob:traversal-min-path"></span>
+2.  If such a path exists, find the minimum number of edges needed to get from $v$ to $w$, while using only edges belonging to $\bigcup_{i=0}^{k} E_i$.
 
 If some $e = (u,v) \in G_i$, we must have $u,v \in V(G_i)$. But the converse is not always true.
 
-Sometimes, condition <a href="#prob:traversal-exists-path" data-reference-type="ref" data-reference="prob:traversal-exists-path">[prob:traversal-exists-path]</a> fails, as in Figure <a href="#fig:traversal-no-path" data-reference-type="ref" data-reference="fig:traversal-no-path">[fig:traversal-no-path]</a>. In such a case, it is sufficient for one party to be convinced that no path exists.
+Sometimes, condition (1) fails, as in Figure (TRAV no path). In such a case, it is sufficient for one party to be convinced that no path exists.
 
 ## Two-party lower bounds
 
 We begin by considering the case with only two players and thus two subgraphs. Let these players be named Alice and Bob, with subgraphs $G_A$ and $G_B$ respectively. Denote this problem by $trav_2$, i.e. the traversal problem for 2 players, where $|V(G)| = n$ and $|E(G)| = O(n^2)$.
 
+**Claim 3**. Recall that equality $EQ$ has inputs $x,y \in \{0,1\}^n$, and $EQ(x,y) = 1$ iff $x = y$. Then $D(TRAV_2) \geq D(EQ)$ and so on.
 
-**Claim 3**. *Recall that equality $EQ$ has inputs $x,y \in \{0,1\}^n$, and $EQ(x,y) = 1$ iff $x = y$. Then $D(TRAV_2) \geq D(EQ)$ and so on.*
-
-
-*Proof.* **Equality gadget.** We construct a gadget that enforces equality at a single bit position. The gadget is shown in Figure <a href="#fig:equality_gadget" data-reference-type="ref" data-reference="fig:equality_gadget">[fig:equality_gadget]</a>. The gadget consists of two parallel branches.
+*Proof.* **Equality gadget.** We construct a gadget that enforces equality at a single bit position. The gadget is shown in Figure (equality gadget). The gadget consists of two parallel branches.
 
 1.  The top branch corresponds to the assignment $x_i = y_i = 1$,
 
 2.  The bottom branch corresponds to the assignment $x_i = y_i = 0$.
 
-<span id="fig:equality_gadget" label="fig:equality_gadget"></span>
-
 The idea is that Alice enables exactly one entry node of the gadget depending on $x_i$, and Bob enables exactly one exit node depending on $y_i$. A path exists through the gadget if and only if Alice and Bob select nodes on the same branch, which holds exactly when $x_i = y_i$.
 
-**Reduction to our graph problem.** Construct a graph of $n$ equality gadgets in a chain, as in Figure <a href="#fig:equality-gadget-chain" data-reference-type="ref" data-reference="fig:equality-gadget-chain">[fig:equality-gadget-chain]</a>. Construct subgraph $G_A$ as follows: Include all vertices at the start and end of each equality gadget. Also, for every $i \in [n]$, give the vertex labelled $x_i = 1$ if this is true, else $x_i = 0$. Then, add all edges between these vertices, as well as all edges between $x_i = z$ and $y_i = z$ for $z \in \{0,1\}$. Do similar for $G_B$.
+**Reduction to our graph problem.** Construct a graph of $n$ equality gadgets in a chain, as in Figure (equality gadget chain). Construct subgraph $G_A$ as follows: Include all vertices at the start and end of each equality gadget. Also, for every $i \in [n]$, give the vertex labelled $x_i = 1$ if this is true, else $x_i = 0$. Then, add all edges between these vertices, as well as all edges between $x_i = z$ and $y_i = z$ for $z \in \{0,1\}$. Do similar for $G_B$.
 
 In the resulting graph, there exists a path from $v$ to $w$ if and only if all gadgets are traversable, which occurs if and only if $x_i = y_i$ for all $i$, i.e., if and only if $x = y$.
 
-We conclude by noting that the resulting graph $G$ has $\Theta(n)$ vertices and $\Theta(n)$ edges. ◻
+We conclude by noting that the resulting graph $G$ has $\Theta(n)$ vertices and $\Theta(n)$ edges. ◻
 
+**Claim 4**. Recall that in two-party $DISJ$, Alice and Bob are given sets $X, Y \subseteq [n]$ each. The goal is to determine whether $X \cap Y = \emptyset$. We claim $D(TRAV_2) \geq D(DISJ)$ and so on.
 
-
-**Claim 4**. *Recall that in two-party $DISJ$, Alice and Bob are given sets $X, Y \subseteq [n]$ each. The goal is to determine whether $X \cap Y = \emptyset$. We claim $D(TRAV_2) \geq D(DISJ)$ and so on.*
-
-
-
-
-*Proof.* **Disjointness gadget.** We construct a gadget that enforces disjointness at a single entry $i \in [n]$. The gadget is shown in Figure <a href="#fig:disjoint_gadget" data-reference-type="ref" data-reference="fig:disjoint_gadget">[fig:disjoint_gadget]</a>. There, let $x_i$ and $y_1$ be indicator functions whether $i \in X$ and $i \in Y$ respectively. Then:
+*Proof.* **Disjointness gadget.** We construct a gadget that enforces disjointness at a single entry $i \in [n]$. The gadget is shown in Figure (disjoint gadget). There, let $x_i$ and $y_1$ be indicator functions whether $i \in X$ and $i \in Y$ respectively. Then:
 
 1.  The top branch corresponds to when $x_i$ has the element but $y_i$ does not
 
@@ -152,78 +139,57 @@ In other words, there is no path left to right if $i \in X \cap Y$.
 
 In the resulting graph, there exists a path from $v$ to $w$ if and only if all disjointness gadgets are traversable, which occurs if and only if $X \cap Y = \emptyset$.
 
-We conclude by noting that $|V(G)| = \Theta(n)$ and $|E(G)| = \Theta(n)$. ◻
-
-
+We conclude by noting that $|V(G)| = \Theta(n)$ and $|E(G)| = \Theta(n)$. ◻
 
 ## Specialized two-party lower bounds
 
 The previous proofs show that $TRAV_2$ is maximally complicated in terms of deterministic communication complexity, and almost maximally complicated in terms of randomized communication complexity. A natural follow up question is to ask if we can do better. That is, given some additional constraints, can we solve the problem with less communication asymptotically?
 
-
 **Definition 1**. *Define the $CTRAV_2$ problem as a $TRAV_2$ problem where $G_A$ and $G_B$ are guaranteed to be complete and connected.*
 
-
-
-
-**Claim 5**. *$D(CTRAV_2) \geq D(DISJ)$ and so on.*
-
-
+**Claim 5**. $D(CTRAV_2) \geq D(DISJ)$ and so on.
 
 *Proof.* If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
 
-Since $G_A$ and $G_B$ are complete, then a valid path occurs if and only if $V(G_A) \cap V(G_B) \neq \emptyset$. Then, by a similar argument to Claim <a href="#claim:disjoint-trav-bound" data-reference-type="ref" data-reference="claim:disjoint-trav-bound">4</a>, this problem is at least as hard as $DISJ$. Thus $D(CTRAV_2) \geq D(DISJ)$ and so on. ◻
-
-
+Since $G_A$ and $G_B$ are complete, then a valid path occurs if and only if $V(G_A) \cap V(G_B) \neq \emptyset$. Then, by a similar argument to Claim 4, this problem is at least as hard as $DISJ$. Thus $D(CTRAV_2) \geq D(DISJ)$ and so on. ◻
 
 This tells us that the local structure of $G_A$ and $G_B$ alone is not a significant source of communication difficulty. That is, even when $G_A$ and $G_B$ are complete graphs, we do not get obviously better lower bounds.
 
 **Definition 2**. *Define $STRAV_2$ as a $TRAV_2$ problem where $E(G) = O(n)$, $E(G_A) = O(n)$, and $E(G_B) = O(n)$. In other words, the graph $G$ is sparse and $G_A$, $G_B$ are sparse too.*
 
-
-
-**Claim 6**. *$D(STRAV_2) \geq D(DISJ)$ and so on.*
-
+**Claim 6**. $D(STRAV_2) \geq D(DISJ)$ and so on.
 
 *Proof.* Consider the case where $G_A$ and $G_B$ are connected. If the start $v$ or end $w$ is in neither $G_A$ nor $G_B$ or both in one of $G_A$ or $G_B$, the problem can be resolved in $O(1)$ communication. So suppose $v \in G_A$ and $w \in G_B$.
 
-Then a valid path occurs if and only if $V(G_A) \cap V(G_B) \neq \emptyset$. Then, by a similar argument to Claim <a href="#claim:disjoint-trav-bound" data-reference-type="ref" data-reference="claim:disjoint-trav-bound">4</a>, this problem is at least as hard as $DISJ$. Thus $D(STRAV_2) \geq D(DISJ)$ and so on. ◻
-
-
+Then a valid path occurs if and only if $V(G_A) \cap V(G_B) \neq \emptyset$. Then, by a similar argument to Claim 4, this problem is at least as hard as $DISJ$. Thus $D(STRAV_2) \geq D(DISJ)$ and so on. ◻
 
 This tells us that weak edge sparsity of $G$, $G_A$, and $G_B$ does not add nor remove significant communication cost.
 
 # The Iterated Two-Party Traversal Problem
 
-In section <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a>, we considered $TRAV_2$, the communication game where both Alice and Bob computed the minimum length path from $v$ to $w$ under some conditions. However, many problems that are modelled by $TRAV_2$ tend to occur *iteratively*.
+In section 2, we considered $TRAV_2$, the communication game where both Alice and Bob computed the minimum length path from $v$ to $w$ under some conditions. However, many problems that are modelled by $TRAV_2$ tend to occur *iteratively*.
 
-For example, consider the motivating problem <a href="#ex:motivating-problem" data-reference-type="ref" data-reference="ex:motivating-problem">1.1</a>. A user may want to send multiple queries in succession, while having partial information of the state of the system based on their previous queries. We try to generalize this notion here.
-
+For example, consider the motivating problem 1.1. A user may want to send multiple queries in succession, while having partial information of the state of the system based on their previous queries. We try to generalize this notion here.
 
 **Definition 3**. *Let $ITRAV_2$ be the following communication game: A graph $G = (V,E)$ is known, and two players Alice and Bob receive initial subgraphs $G_A^0$ and $G_B^0$ of $G$. Call this iteration $t = 0$. Alice and Bob then play $TRAV_2$ on $G$, $G_A^0$, and $G_B^0$. Then, some process $p$ will transform $G_A^0$ into $G_A^1$, and $G_B^1 = p(G_B^0)$. Then Alice and Bob play $TRAV_2$ on $G$, $G_A^1$, and $G_B^1$. This process continues for an indefinite number of iterations $t$.*
 
 *Thus, a game of $ITRAV$ is an infinite iteration of $TRAV_2$ games on some graph $G$ with subgraphs changing between iterations by some process $p$. There are two measures for the communication complexity of $ITRAV_2(G,G_A^0,G_B^0,p)$: First, the *initial* communication cost, i.e. the communication at iteration $0$, and the *iterative* communication cost, i.e. the communication between one iteration and the next.*
 
-
-
-
 **Example 1**. *Suppose $p$ is a process that constructs $G_A^{t+1}$ from $G_A^t$ as follows: add one vertex $v \notin G_A^t$ and all edges $(v,u) \in E(G)$ with $(v,u) \notin E(G_A^t)$, $\forall u \in V(G_A^t)$ to create $H_A^t$. Then delete one vertex $v' \in H_A^t$ and all edges $(v',u') \in E(G)$ with $(v',u') \notin E(H_A^t)$, $\forall u' \in V(H_A^t)$. This finally creates $G_A^{t+1}$. The choice of vertex is uniformly random in both cases. The same applies for $G_B^t$.*
 
 *Then if in the initial iteration Alice and Bob send all of their inputs, every iteration afterwards Alice and Bob can solve $TRAV_2$ with only $2\log(n) + 1$ additional communication, where Alice communicates the vertices added and removed to Bob and Bob returns a single bit to denote if a traversal still exists.*
-
-
 
 The rest of this section is under construction!
 
 # The Multi-Party Traversal Problem
 
-In section <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a>, we considered $TRAV_2$, the communication game where both Alice and Bob computed the minimum length path from $v$ to $w$ using only edges in their subgraphs $G_A$ and $G_B$. Here, we generalize the problem to $TRAV_k$, with $k$ players.
+In section 2, we considered $TRAV_2$, the communication game where both Alice and Bob computed the minimum length path from $v$ to $w$ using only edges in their subgraphs $G_A$ and $G_B$. Here, we generalize the problem to $TRAV_k$, with $k$ players.
 
 The rest of this section is under construction!
 
 # The Iterated Multi-Party Traversal Problem
 
-In section <a href="#sec:iter-two-party" data-reference-type="ref" data-reference="sec:iter-two-party">3</a>, we studied $ITRAV_2$, the iterative version of $TRAV_2$. Here, we study the iterated version of $TRAV_k$, namely $ITRAV_k$.
+In section 3, we studied $ITRAV_2$, the iterative version of $TRAV_2$. Here, we study the iterated version of $TRAV_k$, namely $ITRAV_k$.
 
 The rest of this section is under construction!
 
@@ -233,10 +199,7 @@ In the previous sections, we studied the $TRAV$ and $ITRAV$ class of problems in
 
 ## Unbounded Traversal
 
-
-**Claim 7**. *Suppose Alice and Bob access to the same information about graph $G$. Then the communication cost for any problem based on this alone is $0$.*
-
-
+**Claim 7**. Suppose Alice and Bob access to the same information about graph $G$. Then the communication cost for any problem based on this alone is $0$.
 
 One natural situation for this is in traversal, where Alice and Bob act as agents on a graph, and can traverse the graph to discover vertices and edges. If Alice and Bob start in the same connected component, as each has infinite compute power, each can explore the entire component and solve the problem independently.
 
@@ -266,32 +229,29 @@ These cases motivate a theoretical study of multi-party graph traversal: agents 
 
 We summarize each member’s weekly contributions below:
 
-
-| Week | Ryan Batubara                                                                                                                                                                                                                                                                                                                          | Ivy Hawks                                                                                                                                                                                                                                                                                                                                                              | Darren Ho                                                                                                                                                                                                                                                                                                                                                     | Ciro Zhang                                                                                                                                                                                                                                                                                                                                 |
-|:-----|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Week | Ryan Batubara                                                                                                                                                                                                                                                                                                                          | Ivy Hawks                                                                                                                                                                                                                                                                                                                                                              | Darren Ho                                                                                                                                                                                                                                                                                                                                                     | Ciro Zhang                                                                                                                                                                                                                                                                                                                                 |
-|      | Work on formally writing up proofs for the trivial and other problems for our final report.                                                                                                                                                                                                                                            | Work on formally writing up the proofs for the two party graph traversal problems.                                                                                                                                                                                                                                                                                     | Work on formally writing up the problem statement and motivation for the problem for our final report.                                                                                                                                                                                                                                                        | Work on formally writing up the introduction/motivation for communication complexity for our final report.                                                                                                                                                                                                                                 |
-|      | Help Ivy make the website. Write Github actions to publish to Github Pages. Make subposts components. Wrote CSS.                                                                                                                                                                                                                       | Start a Github pages website with our latest findings. Convert latex to markdown using Pandoc.                                                                                                                                                                                                                                                                         | Write up formalized equality reduction in the report. Include the updated simplified procedure from the Professor.                                                                                                                                                                                                                                            | Integrate all notes so far into the report. Fix typos etc in the other people who are writing the report. Give formal definitions, research sections.                                                                                                                                                                                      |
-|      | Introduction section for report, defining communication complexity and various applications of problems.                                                                                                                                                                                                                               | Look into embedding 3SAT into graph problems. Useful to see techniques to embed hard problems into our problem, especially if we want to prove it is in NP.                                                                                                                                                                                                            | Look deeper into random protocols. In particular, develop a bank of random protocols that we can embed into our problem.                                                                                                                                                                                                                                      | Draw figures of our problem and embeddings in LaTeX for the report and poster.                                                                                                                                                                                                                                                             |
-|      | Looked at extreme case examples in real-life transport networks, e.g. failure of a node, failure of a “central hub” e.g. in the case on natural disasters, etc.                                                                                                                                                                        | Wrote down problem statement and preliminary problem solution in latex using hypergraph.                                                                                                                                                                                                                                                                               | Presented what random protocols are and several different random protocols, namely private and public randomness.                                                                                                                                                                                                                                             | Wrote notes on various variations of shortest path hypergraph problems.                                                                                                                                                                                                                                                                    |
+| Week | Ryan Batubara | Ivy Hawks | Darren Ho | Ciro Zhang |
+|:-----|:--------------|:----------|:----------|:-----------|
+| Week | Ryan Batubara | Ivy Hawks | Darren Ho | Ciro Zhang |
+|      | Work on formally writing up proofs for the trivial and other problems for our final report. | Work on formally writing up the proofs for the two party graph traversal problems. | Work on formally writing up the problem statement and motivation for the problem for our final report. | Work on formally writing up the introduction/motivation for communication complexity for our final report. |
+|      | Help Ivy make the website. Write Github actions to publish to Github Pages. Make subposts components. Wrote CSS. | Start a Github pages website with our latest findings. Convert latex to markdown using Pandoc. | Write up formalized equality reduction in the report. Include the updated simplified procedure from the Professor. | Integrate all notes so far into the report. Fix typos etc in the other people who are writing the report. Give formal definitions, research sections. |
+|      | Introduction section for report, defining communication complexity and various applications of problems. | Look into embedding 3SAT into graph problems. Useful to see techniques to embed hard problems into our problem, especially if we want to prove it is in NP. | Look deeper into random protocols. In particular, develop a bank of random protocols that we can embed into our problem. | Draw figures of our problem and embeddings in LaTeX for the report and poster. |
+|      | Looked at extreme case examples in real-life transport networks, e.g. failure of a node, failure of a “central hub” e.g. in the case on natural disasters, etc. | Wrote down problem statement and preliminary problem solution in latex using hypergraph. | Presented what random protocols are and several different random protocols, namely private and public randomness. | Wrote notes on various variations of shortest path hypergraph problems. |
 |      | Identified various problems that involved the readings that we have found so far. Determined multiparty communication networks with self-driving cars shows promise. Showed how set disjointness can be used to determine collisions with self-driving cars. Also identified a protocol to compute this. Formalized potential problem. | Presented two papers on communication complexity of graph properties to see if there is any information that could be applied to self driving cars. Also presented problems that we will begin working on, with identifying a class of problems where the communication complexity is o(n) by using the blackboard or third party model. Formalized potential problem. | Presented two papers on communication complexity of graph problems. One of them was on determining graph cliques, which can be used to determine whether or not there exists a clique, or a complete network. The other was to show a potential idea on how we can use ideas from other fields of study to compare with communication complexity. Took notes. | Presented a referee model, which we deduced to be the same as the blackboard model. We determined that this idea does not really work for our use case. Identified a critical flaw within our idea that was addressed. Found that our problem was too trivial and by removing/increasing certain assumptions the results remained trivial. |
-|      | Drafted communication problems with multiparty graph traversal avoiding intersections. Attempted hidden matching problem communication complexity but determined that it would be trivial by having each person explore all nodes.                                                                                                     | Drafted communication problems with multiparty weighted graph intersection. Determined that the majority of problems and solutions involved trivial solutions.                                                                                                                                                                                                         | Drafted communication problems with regards to black hole problems where there is a node that eliminates all players. Determined that finding it would be trivial by only communicating after 2 or n moves. Recorded meeting notes.                                                                                                                           | Drafted communication problems where everyone knows about their distance from each other but not any information about the graph. Determined that it would be trivial.                                                                                                                                                                     |
+|      | Drafted communication problems with multiparty graph traversal avoiding intersections. Attempted hidden matching problem communication complexity but determined that it would be trivial by having each person explore all nodes. | Drafted communication problems with multiparty weighted graph intersection. Determined that the majority of problems and solutions involved trivial solutions. | Drafted communication problems with regards to black hole problems where there is a node that eliminates all players. Determined that finding it would be trivial by only communicating after 2 or n moves. Recorded meeting notes. | Drafted communication problems where everyone knows about their distance from each other but not any information about the graph. Determined that it would be trivial. |
 
 Weekly contributions by team member.
-
-
 
 # Updated Proposal
 
 We take a graph, upon which there are players who wish to identify if the graph possesses some property. We wish to use this model to find the minimum communication required for each player to identify if this property exists. Each Player will receive some portion of the graph as their input–this can be either vertices, edges, or both. We mostly study reachability of vertices, in which the only paths considered valid are paths which use only the portions of the graph given to the players as inputs.
 
-For motivation, please see Section <a href="#sec:introduction" data-reference-type="ref" data-reference="sec:introduction">1</a> of the report.
+For motivation, please see Section 1 of the report.
 
 ## Project Goals
 
-Sections <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a>, <a href="#sec:iter-two-party" data-reference-type="ref" data-reference="sec:iter-two-party">3</a>, <a href="#sec:multi-party" data-reference-type="ref" data-reference="sec:multi-party">4</a>, and <a href="#sec:iter-multi-party" data-reference-type="ref" data-reference="sec:iter-multi-party">5</a> formally define our problem statement and the full spectrum of problems we are considering for our project.
+Sections 2, 3, 4, and 5 formally define our problem statement and the full spectrum of problems we are considering for our project.
 
-Clearly, section <a href="#sec:two-party" data-reference-type="ref" data-reference="sec:two-party">2</a> is done. Much of the results for the remaining sections are also complete, and it only remains to formalize and type them up in LaTeX.
+Clearly, section 2 is done. Much of the results for the remaining sections are also complete, and it only remains to formalize and type them up in LaTeX.
 
 ## Actionables
 
@@ -319,32 +279,23 @@ To be more specific, the paper will take the form of a research paper, where we 
 
 Our detailed weekly progress is shown in the previous appendix section. In the remaining time, we plan for the following actionables for each person:
 
-
-| Week | Ryan Batubara                                               | Ivy Hawks                                                         | Darren Ho                                                                      | Ciro Zhang                                                                              |
-|:-----|:------------------------------------------------------------|:------------------------------------------------------------------|:-------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------|
-| Week | Ryan Batubara                                               | Ivy Hawks                                                         | Darren Ho                                                                      | Ciro Zhang                                                                              |
+| Week | Ryan Batubara | Ivy Hawks | Darren Ho | Ciro Zhang |
+|:-----|:--------------|:----------|:----------|:-----------|
+| Week | Ryan Batubara | Ivy Hawks | Darren Ho | Ciro Zhang |
 |      | Finish the other problems section, with a focus on figures. | Finish the iterated multi-party section, with a focus on figures. | Make significant progress on the multi party section, with a focus on figures. | Make significant progress on the iterated multi-party section, with a focus on figures. |
-|      | Finish the multi-party section.                             | Finish the iterated multi-party section.                          | Finish the website port.                                                       | Move figures to first draft of poster.                                                  |
-|      | Polish paper and proofread website.                         | Polish website and proofread poster.                              | Polish poster and proofread paper.                                             | Polish poster and proofread paper.                                                      |
+|      | Finish the multi-party section. | Finish the iterated multi-party section. | Finish the website port. | Move figures to first draft of poster. |
+|      | Polish paper and proofread website. | Polish website and proofread poster. | Polish poster and proofread paper. | Polish poster and proofread paper. |
 
 Weekly plan
 
+[^1]: Eurocontrol, *Ash-cloud of April and May 2010: Impact on Air Traffic* (2010). https://www.eurocontrol.int/publication/ash-cloud-april-and-may-2010-impact-air-traffic
+[^2]: Donovan, B. & Work, D. B., “Empirically quantifying city-scale transportation system resilience to extreme events,” *Transportation Research Part C* 79 (2017), 333–346. https://doi.org/10.1016/j.trc.2017.03.002
+[^3]: PennDOT, “Surveying on I-95 Girard Point Bridge Improvement Project in Southwest Philadelphia” (Feb 2026). https://www.pa.gov/agencies/penndot/news-and-media/newsroom/district-6/2026/surveying-on-i-95-girard-point-bridge-improvement-project-in-phi
+[^4]: Wan, Z. et al., “Analysis of the impact of Suez Canal blockage on global maritime transportation networks,” (2023). https://ui.adsabs.harvard.edu/abs/2023OCM...24506868W/abstract
+[^5]: PBS NewsHour, “How Baltimore’s Key Bridge collapse will affect supply chains and the economy” (Mar 28, 2024). https://www.pbs.org/newshour/nation/how-baltimores-key-bridge-collapse-will-affect-supply-chains-and-the-economy
+[^6]: Congressional Research Service, “Colonial Pipeline: The DarkSide Strikes” (IN11667, May 11, 2021). https://www.everycrsreport.com/reports/IN11667.html
+[^7]: Cloudflare, “Understanding how Facebook disappeared from the Internet” (Oct 4, 2021). https://blog.cloudflare.com/october-2021-facebook-outage/
+[^8]: RIPE Labs, “A quick look at the attack on Dyn” (Oct 24, 2016). https://labs.ripe.net/author/massimo_candela/a-quick-look-at-the-attack-on-dyn/
 
-
-Indeed, given our weekly contributions thus far we are on track to finishing the project with a week dedicated solely to polishing.
-
-[^1]: \footcite{AVIATION}.
-
-[^2]: \footcite{DONOVAN2017333}.
-
-[^3]: \footcite{penndot_i95_2026}.
-
-[^4]: \footcite{2023OCM...24506868W}.
-
-[^5]: \footcite{pbs_bridge_collapse_2024}.
-
-[^6]: \footcite{crs_colonial_pipeline_2021}.
-
-[^7]: \footcite{cloudflare_facebook_outage_2021}.
-
-[^8]: \footcite{deec66cadd6f410aac1f78a555982100}.
+[^raoyehudayoff]: Rao, A. & Yehudayoff, A., *Communication Complexity and Applications* (Cambridge University Press, 2019). https://www.cambridge.org/core/books/communication-complexity/5F44993E3B2597174B71D3F21E748443
+[^roughgarden]: Roughgarden, T., *Communication Complexity (for Algorithm Designers)* (lecture notes). https://theory.stanford.edu/~tim/w15/l/w15.pdf
