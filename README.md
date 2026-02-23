@@ -5,3 +5,5 @@ How to run:
 `npm run dev`
 
 DO NOT use bun. It breaks code blocks because of patched node modules.
+
+Link to website (For Checkpoint): rybplayer.github.io/capstone/
