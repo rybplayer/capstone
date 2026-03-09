@@ -74,19 +74,21 @@ const { title } = Astro.props
     margin: 1.25rem auto;
     border-radius: 0.75rem;
     border: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
-    background: color-mix(in oklab, var(--background) 92%, white 8%);
+    background: var(--background);
     padding: 0.625rem;
     transition: transform 140ms ease, box-shadow 180ms ease;
-    box-shadow: 0 10px 26px color-mix(in oklab, var(--foreground) 12%, transparent);
+    box-shadow: 0 10px 26px color-mix(in oklab, var(--foreground) 18%, transparent);
   }
 
   .capstone-content .report-figure:hover {
     transform: translateY(-1px) scale(1.005);
-    box-shadow: 0 16px 34px color-mix(in oklab, var(--foreground) 16%, transparent);
+    box-shadow: 0 16px 34px color-mix(in oklab, var(--foreground) 22%, transparent);
   }
 
-  html.dark .capstone-content .report-figure,
-  html[data-theme='dark'] .capstone-content .report-figure {
+  [data-theme='dark'] .capstone-content .report-figure {
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
     filter: invert(1) hue-rotate(180deg);
   }
 
@@ -97,7 +99,7 @@ const { title } = Astro.props
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background: color-mix(in oklab, #000 42%, transparent);
+    background: oklch(from var(--foreground) l c h / 0.4);
     z-index: 70;
     backdrop-filter: blur(2px);
   }
@@ -113,7 +115,7 @@ const { title } = Astro.props
     border-radius: 0.875rem;
     background: var(--background);
     border: 1px solid color-mix(in oklab, var(--border) 78%, transparent);
-    box-shadow: 0 24px 80px color-mix(in oklab, #000 35%, transparent);
+    box-shadow: 0 24px 80px color-mix(in oklab, var(--foreground) 35%, transparent);
   }
 
   .report-lightbox-image {
@@ -125,8 +127,7 @@ const { title } = Astro.props
     margin: 0 auto;
   }
 
-  html.dark .report-lightbox-image,
-  html[data-theme='dark'] .report-lightbox-image {
+  [data-theme='dark'] .report-lightbox-image {
     filter: invert(1) hue-rotate(180deg);
   }
 

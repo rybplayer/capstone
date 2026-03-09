@@ -3,9 +3,12 @@ layout: ../layouts/CapstonePageLayout.astro
 title: Multi-Party
 ---
 
+import kDisjGadget from './figures/k_disj_gadget.svg?url'
+import kDisjChain from './figures/k_disj_chain.svg?url'
+
 # Multi-Party Model
 
-In the [Two-Party Model](/two-party#sec-two-party), we analyzed $\mathsf{TRAV}_2$, the two-party traversal problem. We now study the $k$-party version, denoted $\mathsf{TRAV}_k$, with $k \geq 2$.
+In the [Two-Party Model](../two-party#sec-two-party), we analyzed $\mathsf{TRAV}_2$, the two-party traversal problem. We now study the $k$-party version, denoted $\mathsf{TRAV}_k$, with $k \geq 2$.
 
 <span id="def-multi-party-trav"></span>
 **Definition.** Let $G=(V,E)$ be an undirected graph with designated start and end vertices $v,w \in V$, where $|V|=n$. There are $k$ players, and player $i \in [k]$ owns a vertex subset $V_i \subseteq V$. The edge set owned by player $i$ is $E_i=\{(a,b) \in E \mid \{a,b\} \cap V_i \neq \emptyset\}$. Thus player $i$ owns a subgraph $G_i=(V_i,E_i)$. Given a fixed $G$, start vertex $v$, and end vertex $w$ known to all players, an instance of $\mathsf{TRAV}_k$ is defined as follows: $\mathsf{TRAV}_k(G_1,\ldots,G_k):(\{0,1\}^n)^k \to \{0,1\}$, where $\mathsf{TRAV}_k(G_1,\ldots,G_k)=1$ if there is a path from $v$ to $w$ in $\bigcup_{i=1}^k G_i$, and $\mathsf{TRAV}_k(G_1,\ldots,G_k)=0$ otherwise.
@@ -13,20 +16,20 @@ In the [Two-Party Model](/two-party#sec-two-party), we analyzed $\mathsf{TRAV}_2
 <span id="def-k-party-disj"></span>
 **Definition.** The $k$-party disjointness problem $\mathsf{DISJ}_k$ is defined as follows: each player $i \in [k]$ has input $x^{(i)} \in \{0,1\}^n$, interpreted as a subset $S_i=\{j \in [n] \mid x^{(i)}_j=1\} \subseteq [n]$. Define $\mathsf{DISJ}_k(x^{(1)},\ldots,x^{(k)}):(\{0,1\}^n)^k \to \{0,1\}$, where $\mathsf{DISJ}_k(x^{(1)},\ldots,x^{(k)})=1$ if $\bigcap_{i=1}^k S_i=\emptyset$, and $\mathsf{DISJ}_k(x^{(1)},\ldots,x^{(k)})=0$ if $\bigcap_{i=1}^k S_i\neq\emptyset$.
 
-It is well known that $D(\mathsf{DISJ}_k)=\Omega(nk)$ and $R(\mathsf{DISJ}_k)=\Omega(nk)$ [[Braverman et. al, 2013](/conclusion/#braverman)].
+It is well known that $D(\mathsf{DISJ}_k)=\Omega(nk)$ and $R(\mathsf{DISJ}_k)=\Omega(nk)$ [[Braverman et. al, 2013](../conclusion/#braverman)].
 
 <span id="claim-k-party-disj-to-trav"></span>
 **Claim.** $\mathsf{TRAV}_k$ is at least as hard as $\mathsf{DISJ}_k$. Furthermore, $D(\mathsf{TRAV}_k)=\Theta(nk)$ and $R(\mathsf{TRAV}_k)=\Theta(nk)$.
 
-**Proof.** Let $(x^{(1)},\dots,x^{(k)})$ be an input to $\mathsf{DISJ}_k$ with $x^{(i)}\in\{0,1\}^n$. The high-level idea is similar to [the two-party disjointness reduction](/two-party#claim-disjoint-trav-bound): we build a $\mathsf{TRAV}_k$ instance from a chain of $n$ multi-party disjointness gadgets.
+**Proof.** Let $(x^{(1)},\dots,x^{(k)})$ be an input to $\mathsf{DISJ}_k$ with $x^{(i)}\in\{0,1\}^n$. The high-level idea is similar to [the two-party disjointness reduction](../two-party#claim-disjoint-trav-bound): we build a $\mathsf{TRAV}_k$ instance from a chain of $n$ multi-party disjointness gadgets.
 
 **Multi-party disjointness gadget.** For each index $j \in [n]$, create vertices $L_j$, $R_j$, and $M_j$. All players own $L_j$ and $R_j$. Furthermore, player $i$ owns $M_j$ if and only if $x^{(i)}_j=0$. Then there is a valid path from $L_j$ to $R_j$ if and only if at least one player has $x_j^{(i)}=0$. Equivalently, there is no such path if and only if all players have $x_j^{(i)}=1$.
 
-<img class="report-figure" src="/src/pages/figures/k_disj_gadget.svg" alt="Multi-party disjointness gadget for index j" />
+<img class="report-figure" src={kDisjGadget} alt="Multi-party disjointness gadget for index j" />
 
 **Reduction to $\mathsf{TRAV}_k$.** We construct a graph $G$ by chaining $n$ copies of the multi-party disjointness gadget, connecting $R_l=L_{l+1}$ for all $l \in [n-1]$. Set the start vertex $v=L_1$ and end vertex $w=R_n$. Then there is a path from $v$ to $w$ in $\bigcup_{i=1}^k G_i$ if and only if every gadget is traversable (that is, there is a path from $L_j$ to $R_j$ for all $j \in [n]$). This means that for every $j$, there is some player with $x_j^{(i)}=0$, so $\bigcap_{i=1}^k S_i=\emptyset$. In other words, a path from $v$ to $w$ witnesses that every element in $[n]$ is missing from at least one subset $S_i$.
 
-<img class="report-figure" src="/src/pages/figures/k_disj_chain.svg" alt="Chain of multi-party disjointness gadgets" />
+<img class="report-figure" src={kDisjChain} alt="Chain of multi-party disjointness gadgets" />
 
 We conclude the proof by noting that the construction uses $\Theta(n)$ vertices and edges. Hence $D(\mathsf{TRAV}_k)=\Omega(nk)$ and $R(\mathsf{TRAV}_k)=\Omega(nk)$.
 

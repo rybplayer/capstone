@@ -3,6 +3,10 @@ layout: ../layouts/CapstonePageLayout.astro
 title: Introduction
 ---
 
+import equalityMatrix from './figures/equality_matrix.svg?url'
+import validPath from './figures/valid_path.svg?url'
+import noPath from './figures/no_path.svg?url'
+
 # Introduction
 
 <span id="ex-motivating-problem"></span>
@@ -28,7 +32,7 @@ We call such problems maximally hard because they have a deterministic communica
 
 Therefore, $M$ is the identity matrix. It is a well-known fact that the deterministic communication complexity of a problem is at least the base-2 logarithm of the rank of its boolean matrix. Since equality's matrix $M$ is the $2^n \times 2^n$ identity matrix with rank $2^n$, we have $D(\mathsf{EQ})=\Omega(\log_2 2^n)=\Omega(n)$.
 
-<img class="report-figure" src="/src/pages/figures/equality_matrix.svg" alt="An example communication matrix for the equality function." />
+<img class="report-figure" src={equalityMatrix} alt="An example communication matrix for the equality function." />
 
 Communication matrix for the equality function on two-bit inputs. The entry at column $a$ and row $b$ is $1$ when $a=b$ and $0$ otherwise.
     
@@ -36,7 +40,7 @@ As we will soon see, problems like equality are surprisingly useful for proving 
 
 ## The Graph Traversal Problem
 
-In this report, we study the problem of finding a path in a graph whose vertices may be owned by various players. This is an abstract version of the motivating problem in the section [Motivating Communication Complexity](/introduction#ex-motivating-problem), which we choose to work in so that any bounds we prove will be applicable to a wide range of problems.
+In this report, we study the problem of finding a path in a graph whose vertices may be owned by various players. This is an abstract version of the motivating problem in the section [Motivating Communication Complexity](#ex-motivating-problem), which we choose to work in so that any bounds we prove will be applicable to a wide range of problems.
 
 Informally, the graph traversal problem presents a graph, where players may own vertices. There is a start and end vertex. The players wish to know whether there exists a path from the start to the end through only vertices owned by some player. Each player knows what the graph looks like, and which vertices they own though not which vertices are owned by other players.
 
@@ -48,6 +52,6 @@ Let the graph $G$ have $|V|=n$ vertices. Then each player's subgraph can be repr
 
 The following figures illustrate what $\mathsf{TRAV}_2$ may look like.
 
-<img class="report-figure" src="/src/pages/figures/valid_path.svg" alt="Example where a valid path exists for TRAV2" />
+<img class="report-figure" src={validPath} alt="Example where a valid path exists for TRAV2" />
 
-<img class="report-figure" src="/src/pages/figures/no_path.svg" alt="Example where no valid path exists for TRAV2" />
+<img class="report-figure" src={noPath} alt="Example where no valid path exists for TRAV2" />
