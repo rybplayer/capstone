@@ -1,0 +1,54 @@
+---
+layout: ../layouts/CapstonePageLayout.astro
+title: Home
+---
+
+import IconLink from '@/components/IconLink.astro'
+
+# Communication Lower Bounds for Multi-Party Graph Traversal
+
+<div class="author-links [&_a]:text-sm [&_a]:text-zinc-600 dark:[&_a]:text-zinc-400 [&_a]:!font-normal [&_a]:no-underline">
+Ryan Batubara ([rbatubara@ucsd.edu](mailto:rbatubara@ucsd.edu)), 
+Ivy Hawks ([mahawks@ucsd.edu](mailto:mahawks@ucsd.edu)), 
+Darren Ho ([dah013@ucsd.edu](mailto:dah013@ucsd.edu)), 
+Ciro Zhang ([ciz001@ucsd.edu](mailto:ciz001@ucsd.edu)).
+
+Mentor: Dr. Shachar Lovett ([slovett@ucsd.edu](mailto:slovett@ucsd.edu)).
+</div>
+
+<div class="not-prose justify-left mt-6 mb-6 flex flex-wrap gap-3 sm:flex-nowrap">
+  <IconLink
+    href="https://github.com/rybplayer/DSCCapstone"
+    icon="lucide:github"
+    text="Report Code"
+  />
+  <IconLink
+    href="https://github.com/rybplayer/DSCCapstone/blob/00ad599fda0a16f41ad0217162537231c6438c74/q2_report/final_report.pdf"
+    icon="lucide:file-chart-column"
+    text="Report PDF"
+  />
+  <IconLink
+    href="https://github.com/rybplayer/DSCCapstone/blob/00ad599fda0a16f41ad0217162537231c6438c74/poster/final_poster.pdf"
+    icon="lucide:file-chart-column"
+    text="Poster"
+  />
+  <IconLink
+    href="https://github.com/rybplayer/capstone"
+    icon="lucide:file-chart-column"
+    text="Website Code"
+  />
+</div>
+
+## Abstract
+
+A large number of computational problems can be modelled as communication games. For example, a graph traversal problem can be modelled as follows: Two players, Alice and Bob, have subgraphs of a known graph $G$, and wish to find a path from vertex $v$ to $w$ using only vertices and edges in either player's subgraphs. Communication complexity studies such situations by creating asymptotic bounds on the minimum amount of communication necessary to complete these tasks. In this report, we prove communication lower and upper bounds for some graph traversal problems, such as the example above.
+
+## Approach Summary and Key findings
+
+By embedding equality and disjointness, we show that the graph traversal problem and its variants are maximally complicated. In other words, one cannot do asymptotically better than to send all of the problem inputs to one player, even when we allow our answers to error some constant bounded number of times.
+
+## Applications
+
+Our results have a variety of implications for algorithm, system, and database designers. If such specialists were to implement algorithms solving $\mathsf{TRAV}_k$ in its most general form, we have proven that there are no "communication tricks" that can be used to get or even approximate the right answer. More formally, there does not exist an algorithm that computes $\mathsf{TRAV}_k$ asymptotically better than the trivial protocol that attains at most a constant bounded error against every possible input.
+
+In particular, we note that the trivial protocol can be implemented by having one player act as the "coordinator," receiving and processing everyone's inputs. In terms of minimizing bits communicated, this means systems that solve problems like $\mathsf{TRAV}_k$ may benefit from having a single, optimized server as opposed to distributed computing. Of course, there are practical, economical, and privacy reasons that may complicate the choice of implementation and the priority of minimizing communication in practice.

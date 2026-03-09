@@ -1,0 +1,136 @@
+---
+import PageHead from '@/components/PageHead.astro'
+import Layout from '@/layouts/Layout.astro'
+
+interface Props {
+  title: string
+}
+
+const { title } = Astro.props
+---
+
+<Layout class="max-w-3xl">
+  <PageHead slot="head" title={title} />
+  <section class="capstone-content prose max-w-none rounded-lg border p-6">
+    <slot />
+  </section>
+</Layout>
+
+<div class="report-lightbox" id="report-lightbox" role="dialog" aria-modal="true" aria-label="Expanded figure">
+  <div class="report-lightbox-panel">
+    <img class="report-lightbox-image" id="report-lightbox-image" alt="" />
+  </div>
+</div>
+
+<script>
+  const setupReportLightbox = () => {
+    const lightbox = document.getElementById('report-lightbox')
+    const lightboxImage = document.getElementById('report-lightbox-image')
+    if (!lightbox || !lightboxImage) return
+
+    const openLightbox = (img: HTMLImageElement) => {
+      lightboxImage.setAttribute('src', img.getAttribute('src') ?? '')
+      lightboxImage.setAttribute('alt', img.getAttribute('alt') ?? '')
+      lightbox.classList.add('is-open')
+      document.body.classList.add('report-lightbox-open')
+    }
+
+    const closeLightbox = () => {
+      lightbox.classList.remove('is-open')
+      document.body.classList.remove('report-lightbox-open')
+    }
+
+    document.querySelectorAll<HTMLImageElement>('.capstone-content .report-figure').forEach((img) => {
+      img.style.cursor = 'zoom-in'
+      img.addEventListener('click', () => openLightbox(img))
+    })
+
+    lightbox.addEventListener('click', (event) => {
+      if (event.target === lightbox || event.target === lightboxImage) {
+        closeLightbox()
+      }
+    })
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeLightbox()
+    })
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupReportLightbox, { once: true })
+  } else {
+    setupReportLightbox()
+  }
+
+  document.addEventListener('astro:page-load', setupReportLightbox)
+</script>
+
+<style is:global>
+  .capstone-content .report-figure {
+    display: block;
+    width: 100%;
+    max-width: 46rem;
+    height: auto;
+    margin: 1.25rem auto;
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--border) 75%, transparent);
+    background: color-mix(in oklab, var(--background) 92%, white 8%);
+    padding: 0.625rem;
+    transition: transform 140ms ease, box-shadow 180ms ease;
+    box-shadow: 0 10px 26px color-mix(in oklab, var(--foreground) 12%, transparent);
+  }
+
+  .capstone-content .report-figure:hover {
+    transform: translateY(-1px) scale(1.005);
+    box-shadow: 0 16px 34px color-mix(in oklab, var(--foreground) 16%, transparent);
+  }
+
+  html.dark .capstone-content .report-figure,
+  html[data-theme='dark'] .capstone-content .report-figure {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  .report-lightbox {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: color-mix(in oklab, #000 42%, transparent);
+    z-index: 70;
+    backdrop-filter: blur(2px);
+  }
+
+  .report-lightbox.is-open {
+    display: flex;
+  }
+
+  .report-lightbox-panel {
+    max-width: min(94vw, 1200px);
+    max-height: 90vh;
+    padding: 1rem;
+    border-radius: 0.875rem;
+    background: var(--background);
+    border: 1px solid color-mix(in oklab, var(--border) 78%, transparent);
+    box-shadow: 0 24px 80px color-mix(in oklab, #000 35%, transparent);
+  }
+
+  .report-lightbox-image {
+    display: block;
+    max-width: min(90vw, 1100px);
+    max-height: calc(90vh - 2rem);
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  html.dark .report-lightbox-image,
+  html[data-theme='dark'] .report-lightbox-image {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  body.report-lightbox-open {
+    overflow: hidden;
+  }
+</style>

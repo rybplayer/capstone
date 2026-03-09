@@ -1,0 +1,31 @@
+---
+layout: ../layouts/CapstonePageLayout.astro
+title: Conclusion
+---
+
+# Conclusion
+
+In this paper, we explored the communication complexity of multiparty graph traversal as defined in the $\mathsf{TRAV}$ problem and its variants. By exploring embeddings of equality and disjointness, we show $\mathsf{TRAV}$ is maximally hard under a variety of conditions in the deterministic and public randomized communication complexity models. In other words, given the most general $\mathsf{TRAV}_k$ for $k \geq 2$, one cannot asymptotically do better than the trivial solution of sending all inputs to one player.
+
+This has a variety of implications for algorithm, system, and database designers. If such specialists were to implement algorithms solving $\mathsf{TRAV}_k$ in its most general form, we have proven that there are no "communication tricks" that can be used to get or even approximate the right answer. More formally, there does not exist an algorithm that computes $\mathsf{TRAV}_k$ asymptotically better than the trivial protocol that attains at most a constant bounded error against every possible input.
+
+In particular, we note that the trivial protocol can be implemented by having one player act as the "coordinator," receiving and processing everyone's inputs. In terms of minimizing bits communicated, this means systems that solve problems like $\mathsf{TRAV}_k$ may benefit from having a single, optimized server as opposed to distributed computing. Of course, there are practical, economical, and privacy reasons that may complicate the choice of implementation and the priority of minimizing communication in practice.
+
+## Future Work
+
+Though we have shown that $\mathsf{TRAV}_k$ and some of its variants are maximally hard under the deterministic and randomized model, it is entirely possible that specialized instances of $\mathsf{TRAV}_k$ give rise to clever algorithms and lower bounds that have significantly less communication complexity. Below, we propose some such variants, which due to practical constraints we cannot examine in this paper.
+
+- **Bounded-length path.** Consider a $\mathsf{TRAV}_2$ problem where we know that if there is a path from $v$ to $w$ in $G$, then this path is of length at most $l=O(1)$. Does this give rise to significantly lower communication complexity? What about for $\mathsf{TRAV}_k$?
+- **Single-connected component.** We noted that $\mathsf{CTRAV}_2$ is also maximally complicated in the deterministic and public coin model. Notice that $G_A$ and $G_B$ in $\mathsf{CTRAV}_2$ are connected components. If we guarantee in $\mathsf{TRAV}_k$ that each $G_i$ is a single connected component, can we achieve lower communication complexity?
+- **Bounded owners.** Suppose it is known that each vertex in $\mathsf{TRAV}_k$ can be owned by at most $p=O(1)$ players. For example, if $p=1$, each vertex can be owned by at most one player. Does this give rise to improved communication lower and upper bounds?
+
+It may also be worthwhile to investigate very specific instances of $\mathsf{TRAV}$ based on real-world networks and graphs. For example, perhaps a combination of the above variants models a specific, real-world problem that gives rise to clever algorithms with non-maximal communication complexity. That said, one benefit of studying the most general cases is the ability for the results to be applicable to a wide range of problems, scenarios, and applications.
+
+# References
+
+<span id="braverman"></span>
+1. Braverman, Mark et al. (2013). “Tight Bounds for Set Disjointness in the Message Passing
+Model”. In: CoRR abs/1305.4696. arXiv: 1305.4696. URL: http://arxiv.org/abs/
+1305.4696.
+<span id="rao"></span>
+2. Rao, Anup and Amir Yehudayoff (2020). Communication Complexity: and Applications. Cambridge University Press.

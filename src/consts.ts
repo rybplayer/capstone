@@ -11,7 +11,13 @@ export const SITE: Site = {
   postsPerPage: 10,
 }
 
-export const NAV_LINKS: SocialLink[] = []
+export const NAV_LINKS: SocialLink[] = [
+  { href: '/', label: 'Home' },
+  { href: '/introduction', label: 'Introduction' },
+  { href: '/two-party', label: 'Two-Party' },
+  { href: '/multi-party', label: 'Multi-Party' },
+  { href: '/conclusion', label: 'Conclusion' },
+]
 
 export const SOCIAL_LINKS: SocialLink[] = []
 
